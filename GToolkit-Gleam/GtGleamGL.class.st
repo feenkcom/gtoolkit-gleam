@@ -28219,6 +28219,33 @@ GtGleamGL class >> GL_Z_EXT [
 	^ GL_Z_EXT
 ]
 
+{ #category : #'private - enums' }
+GtGleamGL class >> allEnums [
+	<return: #Collection of: #GtGleamGLEnum>
+	
+	^ (1 to: self numberOfEnums) collect: [ :anIndex | self enumAt: anIndex ]
+	
+	
+]
+
+{ #category : #'private - enums' }
+GtGleamGL class >> enumAt: anIndex [
+	<return: #GtGleamGLEnum>
+	| anEnum |
+		
+	anEnum := GtGleamGLEnum new.
+	
+	GtBoxerString newDuring: [ :aName |
+		GtBoxerString newDuring: [ :aValue |
+			 GtBoxerString newDuring: [ :aType |
+				self primGLGetEnumAt: anIndex - 1 name: aName value: aValue type: aType.
+				anEnum type: ((aType asString) copyReplaceAll: '''' with: '') ].
+			anEnum value: ((aValue asString copyReplaceAll: '0x' with: '16r') copyReplaceAll: '''' with: '') asNumber ].
+		anEnum name: ((aName asString) copyReplaceAll: '''' with: '') ].
+	
+	^ anEnum
+]
+
 { #category : #'library path' }
 GtGleamGL class >> ffiLibraryName [
 	^ GtGleamLibrary
@@ -28234,6 +28261,27 @@ GtGleamGL class >> loadGles: aBlock [
 	^ self fromNativeHandle: (self primLoadGLes: (self primLoaderCallbackFor: aBlock))
 ]
 
+{ #category : #'private - enums' }
+GtGleamGL class >> numberOfEnums [
+	<return: #Number>
+
+	^ self primGLGetAmountOfEnums
+]
+
+{ #category : #'private - ffi' }
+GtGleamGL class >> primGLGetAmountOfEnums [
+	^ self ffiCall: #(size_t gleam_enum_get_amount_gl())
+]
+
+{ #category : #'private - ffi' }
+GtGleamGL class >> primGLGetEnumAt: anIndex name: aNameString value: aValueString type: aTypeString [
+	^ self ffiCall: #(void gleam_enum_get_at_gl(
+		GtBoxerString aNameString,
+		GtBoxerString aValueString,
+		GtBoxerString aTypeString,
+		size_t anIndex))
+]
+
 { #category : #'private - ffi' }
 GtGleamGL class >> primLoadGL: aCallback [
 	^ self ffiCall: #(void* gleam_load_gl(GtGleamLoadCallback aCallback))
@@ -28241,7 +28289,7 @@ GtGleamGL class >> primLoadGL: aCallback [
 
 { #category : #'private - ffi' }
 GtGleamGL class >> primLoadGLes: aCallback [
-	^ self ffiCall: #(void gleam_load_gles(GtGleamLoadCallback aCallback))
+	^ self ffiCall: #(void* gleam_load_gles(GtGleamLoadCallback aCallback))
 ]
 
 { #category : #'private - ffi' }
@@ -28290,14 +28338,19 @@ GtGleamGL >> bind_framebuffer: aFramebuffer target: aTarget [
 	self ffiCall: #( void gleam_bind_framebuffer ( self, GLenum aTarget, GLuint aFramebuffer ) )
 ]
 
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> bind_renderbuffer: aRenderbuffer target: aTarget [
+	self ffiCall: #( void gleam_bind_renderbuffer ( self, GLenum aTarget, GLuint aRenderbuffer ) )
+]
+
 { #category : #'api - texture' }
 GtGleamGL >> bind_texture: aTexture target: aTarget [
 	self ffiCall: #( void gleam_bind_texture ( self, GLenum aTarget, GLuint aTexture ) )
 ]
 
-{ #category : #'generated bindings' }
-GtGleamGL >> bind_texture_2d: texture [
-	^ self ffiCall: #( void glutin_gl_bind_texture_2d ( self, GLuint texture ) )
+{ #category : #'api - texture' }
+GtGleamGL >> bind_texture_2d: aTexture [
+	^ self ffiCall: #( void gleam_bind_texture_2d ( self, GLuint aTexture ) )
 ]
 
 { #category : #'generated bindings' }
@@ -28305,18 +28358,27 @@ GtGleamGL >> bind_vertex_array: vao [
 	^ self ffiCall: #( void glutin_gl_bind_vertex_array ( self, GLuint vao ) )
 ]
 
-{ #category : #'generated bindings' }
+{ #category : #'api - framebuffer' }
+GtGleamGL >> check_frame_buffer_status: aTarget [
+	<return: #Number>
+
+	^ self ffiCall: #( GLenum gleam_check_frame_buffer_status ( self , GLenum aTarget) )
+]
+
+{ #category : #'api - general' }
 GtGleamGL >> clear: aBufferMask [
-	^ self ffiCall: #( void glutin_gl_clear (
+	^ self ffiCall: #( void gleam_clear (
 		self,
 		GLbitfield aBufferMask) )
 ]
 
-{ #category : #'generated bindings' }
-GtGleamGL >> clear_colorR: r g: g b: b a: a [
-	^ self ffiCall: #( void glutin_gl_clear_color (
-		GlutinGL self,
-		float32 r, float32 g, float32 b, float32 a ) )
+{ #category : #'api - general' }
+GtGleamGL >> clear_color: aColor [
+	self
+		primClearColorR: aColor red
+		g: aColor green
+		b: aColor blue
+		a: aColor blue
 ]
 
 { #category : #'generated bindings' }
@@ -28357,6 +28419,19 @@ GtGleamGL >> delete_framebuffers: aCollectionOfTextures [
 			self primDeleteFramebuffers: aGtBoxerArrayUInt ]
 ]
 
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> delete_renderbuffer: aRenderbuffer [
+	self ffiCall: #( void gleam_delete_renderbuffer ( self, GLuint aRenderbuffer ) )
+]
+
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> delete_renderbuffers: aCollectionOfTextures [
+	GtBoxerArrayUInt
+		withAll: aCollectionOfTextures
+		during: [ :aGtBoxerArrayUInt | 
+			self primDeleteRenderbuffers: aGtBoxerArrayUInt ]
+]
+
 { #category : #'api - texture' }
 GtGleamGL >> delete_texture: aTexture [
 	^ self ffiCall: #( void gleam_delete_texture ( self, GLuint aTexture ) )
@@ -28375,9 +28450,9 @@ GtGleamGL >> disable: aCap [
 	self ffiCall: #(void gleam_disable(self, GLenum aCap))
 ]
 
-{ #category : #'generated bindings' }
+{ #category : #'api - texture' }
 GtGleamGL >> disable_texture_2d [
-	^ self ffiCall: #( void glutin_gl_disable_texture_2d ( GlutinGL self ) )
+	^ self ffiCall: #( void gleam_disable_texture_2d ( self ) )
 ]
 
 { #category : #'generated bindings' }
@@ -28394,9 +28469,9 @@ GtGleamGL >> enable: aCap [
 	self ffiCall: #(void gleam_enable(self, GLenum aCap))
 ]
 
-{ #category : #'generated bindings' }
+{ #category : #'api - texture' }
 GtGleamGL >> enable_texture_2d [
-	^ self ffiCall: #( void glutin_gl_enable_texture_2d ( GlutinGL self ) )
+	^ self ffiCall: #( void gleam_enable_texture_2d ( self ) )
 ]
 
 { #category : #'generated bindings' }
@@ -28414,6 +28489,27 @@ GtGleamGL >> framebufferId [
 ]
 
 { #category : #'api - framebuffer' }
+GtGleamGL >> framebuffer_renderbuffer: aTarget attachment: anAttachment renderbufferTarget: aRenderbufferTarget renderbuffer: aRenderbuffer [
+	self ffiCall: #( void gleam_framebuffer_renderbuffer (
+		self,
+		GLenum aTarget,
+		GLenum anAttachment,
+		GLenum aRenderbufferTarget,
+		GLuint aRenderbuffer ) )
+]
+
+{ #category : #'api - framebuffer' }
+GtGleamGL >> framebuffer_texture_2d: aTarget attachment: anAttachment textureTarget: aTextureTarget texture: aTexture level: aLevel [
+	self ffiCall: #( void gleam_framebuffer_texture_2d (
+		self,
+		GLenum aTarget,
+		GLenum anAttachment,
+		GLenum aTextureTarget,
+		GLuint aTexture,
+		GLint aLevel) )
+]
+
+{ #category : #'api - framebuffer' }
 GtGleamGL >> gen_framebuffer [
 	<return: #Number>
 
@@ -28425,6 +28521,20 @@ GtGleamGL >> gen_framebuffers: anAmount [
 	<return: #Array of: #Number>
 	
 	^ GtBoxerArrayUInt newDuring: [ :aBoxerArrayUInt | self primGenerateFramebuffers: aBoxerArrayUInt amount: anAmount ]
+]
+
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> gen_renderbuffer [
+	<return: #Number>
+
+	^ self ffiCall: #( GLuint gleam_gen_renderbuffer ( self ) )
+]
+
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> gen_renderbuffers: anAmount [
+	<return: #Array of: #Number>
+	
+	^ GtBoxerArrayUInt newDuring: [ :aBoxerArrayUInt | self primGenerateRenderbuffers: aBoxerArrayUInt amount: anAmount ]
 ]
 
 { #category : #'api - texture' }
@@ -28489,9 +28599,21 @@ GtGleamGL >> link_program: program [
 	^ self ffiCall: #( void glutin_gl_link_program ( GlutinGL self, GLuint program ) )
 ]
 
+{ #category : #'private - ffi general' }
+GtGleamGL >> primClearColorR: r g: g b: b a: a [
+	^ self ffiCall: #( void gleam_clear_color (
+		self,
+		float32 r, float32 g, float32 b, float32 a ) )
+]
+
 { #category : #'private - ffi framebuffer' }
 GtGleamGL >> primDeleteFramebuffers: aGtBoxerArrayUInt [
 	^ self ffiCall: #( void gleam_delete_framebuffers ( self, GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+]
+
+{ #category : #'private - ffi renderbuffer' }
+GtGleamGL >> primDeleteRenderbuffers: aGtBoxerArrayUInt [
+	^ self ffiCall: #( void gleam_delete_renderbuffers ( self, GtBoxerArrayUInt aGtBoxerArrayUInt ) )
 ]
 
 { #category : #'private - ffi texture' }
@@ -28504,9 +28626,23 @@ GtGleamGL >> primGenerateFramebuffers: aGtBoxerArrayUInt amount: aNumber [
 	^ self ffiCall: #( void gleam_gen_framebuffers ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
 ]
 
+{ #category : #'private - ffi renderbuffer' }
+GtGleamGL >> primGenerateRenderbuffers: aGtBoxerArrayUInt amount: aNumber [
+	^ self ffiCall: #( void gleam_gen_renderbuffers ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+]
+
 { #category : #'private - ffi texture' }
 GtGleamGL >> primGenerateTextures: aGtBoxerArrayUInt amount: aNumber [
 	^ self ffiCall: #( void gleam_gen_textures ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+]
+
+{ #category : #'api - renderbuffer' }
+GtGleamGL >> renderbuffer_storage: aTarget internalFormat: anInternalFormat width: aWidth height: aHeight [
+	self ffiCall: #( void gleam_renderbuffer_storage ( self,
+		GLenum aTarget,
+		GLenum anInternalFormat,
+		GLsizei aWidth,
+		GLsizei aHeight) )
 ]
 
 { #category : #accessing }
@@ -28521,19 +28657,19 @@ GtGleamGL >> shader_source: shader string: aGtBoxerString [
 	^ self ffiCall: #( void glutin_gl_shader_source ( GlutinGL self, GLuint shader, GtBoxerString aGtBoxerString ) )
 ]
 
-{ #category : #'generated bindings' }
-GtGleamGL >> tex_image_2d_level: level internalformat: internalformat width: width height: height border: border format: format type: type pixels: pixels length: length [
-	^ self ffiCall: #( void glutin_gl_tex_image_2d (
+{ #category : #'api - texture' }
+GtGleamGL >> tex_image_2d: aTarget level: aLevel internalFormat: anInternalFormat width: aWidth height: aHeight border: aBorder format: aFormat type: aType pixels: aGtBoxerArrayU8 [
+	self ffiCall: #( void gleam_tex_image_2d (
 		self,
-		GLint level,
-		GLint internalformat,
-		GLsizei width,
-		GLsizei height,
-		GLint border,
-		GLenum format,
-		GLenum type,
-		uint8* pixels,
-		uint32 length) )
+		GLenum aTarget,
+		GLint aLevel,
+		GLint anInternalFormat,
+		GLsizei aWidth,
+		GLsizei aHeight,
+		GLint aBorder,
+		GLenum aFormat,
+		GLenum aType,
+		GtBoxerArrayU8 aGtBoxerArrayU8) )
 ]
 
 { #category : #'api - texture' }
