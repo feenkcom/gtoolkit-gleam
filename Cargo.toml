@@ -1,0 +1,23 @@
+[package]
+name = "libgleam"
+version = "0.1.0"
+authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+gleam = "0.6.17"
+libc = "0.2.65"
+boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
+
+[lib]
+name = "Gleam"
+crate-type = ["cdylib"]
+
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
+
+[profile.release]
+opt-level = 3
