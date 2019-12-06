@@ -46,9 +46,11 @@ fn gleam_framebuffer_renderbuffer(
     });
 }
 
-
 #[no_mangle]
-pub fn gleam_check_frame_buffer_status(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, target: GLenum) -> GLenum {
+pub fn gleam_check_frame_buffer_status(
+    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
+    target: GLenum,
+) -> GLenum {
     _ptr_gl.with(|gl| gl.check_frame_buffer_status(target))
 }
 

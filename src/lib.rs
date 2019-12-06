@@ -1,6 +1,7 @@
 extern crate boxer;
 extern crate gleam;
 extern crate libc;
+extern crate gl_generator;
 
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
@@ -12,6 +13,8 @@ pub mod gleam_gl;
 pub mod gleam_gl_framebuffer;
 pub mod gleam_gl_renderbuffer;
 pub mod gleam_gl_texture;
+
+include!(concat!(env!("OUT_DIR"), "/gl_enums.rs"));
 
 fn error_callback(_gl: &dyn gleam::gl::Gl, message: &str, error: gleam::gl::GLenum) {
     println!("[GL] error: {} code: {}", message, error);
