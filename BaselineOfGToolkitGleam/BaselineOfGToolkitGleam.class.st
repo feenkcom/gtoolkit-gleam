@@ -25,7 +25,6 @@ BaselineOfGToolkitGleam >> postLoadGleam: spec [
 		ifTrue: [ ^ self ].
 
 	PostLoaded := true.
-	self postLoadInitializeEventsMap: spec.
 	self postLoadInstallGleamBinary: spec
 ]
 
