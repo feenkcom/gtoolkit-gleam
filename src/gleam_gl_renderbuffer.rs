@@ -15,7 +15,11 @@ pub fn gleam_gen_renderbuffers(
 }
 
 #[no_mangle]
-fn gleam_bind_renderbuffer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, target: GLenum, renderbuffer: GLuint) {
+fn gleam_bind_renderbuffer(
+    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
+    target: GLenum,
+    renderbuffer: GLuint,
+) {
     _ptr_gl.with_not_null(|gl| gl.bind_renderbuffer(target, renderbuffer));
 }
 
@@ -27,9 +31,7 @@ fn gleam_renderbuffer_storage(
     width: GLsizei,
     height: GLsizei,
 ) {
-    _ptr_gl.with_not_null(|gl| {
-        gl.renderbuffer_storage(target, internalformat, width, height)
-    });
+    _ptr_gl.with_not_null(|gl| gl.renderbuffer_storage(target, internalformat, width, height));
 }
 
 #[no_mangle]

@@ -1,6 +1,7 @@
 [package]
 name = "libgleam"
 version = "0.1.0"
+build = "build.rs"
 authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 edition = "2018"
 
@@ -8,6 +9,10 @@ edition = "2018"
 gleam = "0.6.17"
 libc = "0.2.65"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
+gl_generator = "0.14"
+
+[build-dependencies]
+gl_generator = "0.14"
 
 [lib]
 name = "Gleam"
