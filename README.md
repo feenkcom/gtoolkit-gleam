@@ -7,7 +7,7 @@ C-style wrapper around OpenGL bindings
 EpMonitor current disable.
 [ 
   Metacello new
-    baseline: 'Gleam';
+    baseline: 'GToolkitGleam';
     repository: 'github://feenkcom/gtoolkit-gleam/src';
     load
 ] ensure: [ EpMonitor current enable ].  
