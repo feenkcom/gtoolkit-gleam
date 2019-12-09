@@ -1,7 +1,7 @@
 extern crate boxer;
+extern crate gl_generator;
 extern crate gleam;
 extern crate libc;
-extern crate gl_generator;
 
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;

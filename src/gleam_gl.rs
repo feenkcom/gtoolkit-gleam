@@ -1,6 +1,7 @@
+use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::BoxerString;
-use boxer::CBox;
+use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::{assert_box, function, CBox};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -35,9 +36,43 @@ pub fn gleam_get_string(
     which: GLenum,
     _ptr_string: *mut BoxerString,
 ) {
+    assert_box(_ptr_gl, function!());
     _ptr_gl.with_not_null(|gl| {
-        CBox::with_raw(_ptr_string, |string| {
-            string.set_string(gl.get_string(which))
+        _ptr_string.with_not_null(|string| string.set_string(gl.get_string(which)))
+    });
+}
+
+#[no_mangle]
+pub fn gleam_read_pixels(
+    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
+    x: GLint,
+    y: GLint,
+    width: GLsizei,
+    height: GLsizei,
+    format: GLenum,
+    pixel_type: GLenum,
+    _ptr_data: *mut ValueBox<BoxerArray<u8>>,
+) {
+    _ptr_gl.with_not_null(|gl| {
+        _ptr_data.with_not_null(|data| {
+            let pixels = gl.read_pixels(x, y, width, height, format, pixel_type);
+            data.set_vector(pixels)
+        })
+    });
+}
+
+#[no_mangle]
+pub fn gleam_get_tex_image_into_buffer(
+    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
+    target: GLenum,
+    level: GLint,
+    format: GLenum,
+    ty: GLenum,
+    _ptr_data: *mut ValueBox<BoxerArray<u8>>,
+) {
+    _ptr_gl.with_not_null(|gl| {
+        _ptr_data.with_not_null(|data| {
+            gl.get_tex_image_into_buffer(target, level, format, ty, data.to_slice())
         })
     });
 }

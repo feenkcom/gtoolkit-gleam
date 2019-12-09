@@ -1,10 +1,10 @@
 extern crate gl_generator;
 
+use gl_generator::{Api, Fallbacks, Profile, Registry};
 use std::env;
 use std::fs::File;
-use std::path::Path;
-use gl_generator::{Registry, Api, Profile, Fallbacks};
 use std::io::Write;
+use std::path::Path;
 
 fn main() {
     let dest = env::var("OUT_DIR").unwrap();
@@ -36,20 +36,37 @@ fn main() {
     );
 
     let _ = file_gl.write_all(
-"use gleam::gl::*;
+        "use gleam::gl::*;
 use boxer::string::{BoxerStringPointer};
 
-".as_bytes());
+"
+        .as_bytes(),
+    );
 
-    let _ = file_gl.write_all(format!("static GL_ENUMS: [(&str, &str, &str); {}] = [", gl_reg.enums.len()).as_bytes());
+    let _ = file_gl.write_all(
+        format!(
+            "static GL_ENUMS: [(&str, &str, &str); {}] = [",
+            gl_reg.enums.len()
+        )
+        .as_bytes(),
+    );
 
-     for each_enum in gl_reg.enums.iter() {
-         let _ = file_gl.write_all(format!("({:?}, {:?}, {:?}), ", each_enum.ident, each_enum.value, each_enum.ty).as_bytes());
-     }
+    for each_enum in gl_reg.enums.iter() {
+        let _ = file_gl.write_all(
+            format!(
+                "({:?}, {:?}, {:?}), ",
+                each_enum.ident, each_enum.value, each_enum.ty
+            )
+            .as_bytes(),
+        );
+    }
 
-    let _ = file_gl.write_all("];\
+    let _ = file_gl.write_all(
+        "];\
 
-".as_bytes());
+"
+        .as_bytes(),
+    );
 
     let _ = file_gl.write_all("
 #[no_mangle]
@@ -61,26 +78,42 @@ pub fn gleam_enum_get_at_gl(_ptr_ident: *mut BoxerString, _ptr_value: *mut Boxer
 }
 ".as_bytes());
 
-        let _ = file_gl.write_all("
+    let _ = file_gl.write_all(
+        "
 #[no_mangle]
 pub fn gleam_enum_get_amount_gl() -> usize {
     GL_ENUMS.len()
 }
-".as_bytes());
-
+"
+        .as_bytes(),
+    );
 
     for each_enum in gl_reg.enums.iter() {
-        let _ = file_gl.write_all(format!("
+        let _ = file_gl.write_all(
+            format!(
+                "
 #[no_mangle]
 pub fn gleam_enum_gl_{}() -> {} {{ {} }}
-", each_enum.ident.to_lowercase(), each_enum.ty, each_enum.ident).as_bytes());
+",
+                each_enum.ident.to_lowercase(),
+                each_enum.ty,
+                each_enum.ident
+            )
+            .as_bytes(),
+        );
 
-        let _ = file_gl.write_all(format!("
+        let _ = file_gl.write_all(
+            format!(
+                "
 #[no_mangle]
 pub fn gleam_enum_type_gl_{}(_ptr_string: *mut BoxerString) {{
     _ptr_string.with_not_null(|string| string.set_string(String::from({:?})) )
 }}
-", each_enum.ident.to_lowercase(), each_enum.ty).as_bytes());
-
+",
+                each_enum.ident.to_lowercase(),
+                each_enum.ty
+            )
+            .as_bytes(),
+        );
     }
 }
