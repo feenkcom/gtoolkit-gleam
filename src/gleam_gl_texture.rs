@@ -56,7 +56,7 @@ pub fn gleam_tex_image_2d(
     ty: GLenum,
     _ptr_data: *mut ValueBox<BoxerArray<u8>>,
 ) {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null(|gl| {
         _ptr_data.with_not_null_return_block(
             || {
                 gl.tex_image_2d(
@@ -88,6 +88,26 @@ pub fn gleam_tex_image_2d(
     });
 }
 
+#[no_mangle]
+pub fn gleam_tex_sub_image_2d(
+    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
+    target: GLenum,
+    level: GLint,
+    xoffset: GLint,
+    yoffset: GLint,
+    width: GLsizei,
+    height: GLsizei,
+    format: GLenum,
+    ty: GLenum,
+    _ptr_data: *mut ValueBox<BoxerArray<u8>>,
+) {
+    _ptr_gl.with_not_null(|gl| {
+        _ptr_data.with_not_null(|data| {
+            gl.tex_sub_image_2d(target, level, xoffset, yoffset, width, height, format, ty, data.to_slice());
+        })
+    });
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////  H E L P E R S ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -115,26 +135,4 @@ pub fn gleam_disable_texture_2d(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) {
 #[no_mangle]
 pub fn gleam_bind_texture_2d(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, texture: GLuint) {
     _ptr_gl.with_not_null(|gl| gl.bind_texture(TEXTURE_2D, texture));
-}
-
-#[no_mangle]
-pub fn gleam_tex_sub_image_2d(
-    _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
-    level: GLint,
-    xoffset: GLint,
-    yoffset: GLint,
-    width: GLsizei,
-    height: GLsizei,
-    format: GLenum,
-    ty: GLenum,
-    array: *const u8,
-    length: u32,
-) {
-    _ptr_gl.with(|gl| {
-        let data: &[u8] = unsafe { std::slice::from_raw_parts(array, length as usize) };
-
-        gl.tex_sub_image_2d(
-            TEXTURE_2D, level, xoffset, yoffset, width, height, format, ty, data,
-        );
-    });
 }
