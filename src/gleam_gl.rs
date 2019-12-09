@@ -31,6 +31,11 @@ pub fn gleam_clear(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, buffer_mask: GLbitfield) 
 }
 
 #[no_mangle]
+pub fn gleam_get_error(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLenum {
+    _ptr_gl.with(|gl| gl.get_error())
+}
+
+#[no_mangle]
 pub fn gleam_get_string(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     which: GLenum,
