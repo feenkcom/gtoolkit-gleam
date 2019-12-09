@@ -103,7 +103,17 @@ pub fn gleam_tex_sub_image_2d(
 ) {
     _ptr_gl.with_not_null(|gl| {
         _ptr_data.with_not_null(|data| {
-            gl.tex_sub_image_2d(target, level, xoffset, yoffset, width, height, format, ty, data.to_slice());
+            gl.tex_sub_image_2d(
+                target,
+                level,
+                xoffset,
+                yoffset,
+                width,
+                height,
+                format,
+                ty,
+                data.to_slice(),
+            );
         })
     });
 }
