@@ -3,7 +3,7 @@
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer#44d823d40f9b31a04d1d3fe11d66d543f2a783be"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer#eb30095fbbba742f2a6a41907fd631982b73b98b"
 
 [[package]]
 name = "cfg-if"
