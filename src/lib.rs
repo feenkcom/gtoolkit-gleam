@@ -1,5 +1,5 @@
 extern crate boxer;
-extern crate gl_generator;
+extern crate glutin;
 extern crate gleam;
 extern crate libc;
 
@@ -18,6 +18,45 @@ include!(concat!(env!("OUT_DIR"), "/gl_enums.rs"));
 
 fn error_callback(_gl: &dyn gleam::gl::Gl, message: &str, error: gleam::gl::GLenum) {
     println!("[GL] error: {} code: {}", message, error);
+}
+
+
+#[no_mangle]
+pub fn glutin_windowed_context_load_gl(_ptr_window: *mut ValueBox<glutin::WindowedContext<glutin::PossiblyCurrent>>) -> *mut ValueBox<Rc<dyn gleam::gl::Gl>> {
+    _ptr_window.with(|window| {
+        let mut gl: std::rc::Rc<(dyn gleam::gl::Gl + 'static)> = match window.get_api() {
+            glutin::Api::OpenGl => unsafe {
+                gleam::gl::GlFns::load_with(|symbol| window.get_proc_address(symbol) as *const _)
+            },
+            glutin::Api::OpenGlEs => unsafe {
+                gleam::gl::GlesFns::load_with(|symbol| window.get_proc_address(symbol) as *const _)
+            },
+            glutin::Api::WebGl => unimplemented!(),
+        };
+
+        gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
+
+        ValueBox::new(gl).into_raw()
+    })
+}
+
+#[no_mangle]
+pub fn glutin_context_load_gl(_ptr_context: *mut ValueBox<glutin::Context<glutin::PossiblyCurrent>>) -> *mut ValueBox<Rc<dyn gleam::gl::Gl>> {
+    _ptr_context.with(|context| {
+        let mut gl: std::rc::Rc<(dyn gleam::gl::Gl + 'static)> = match context.get_api() {
+            glutin::Api::OpenGl => unsafe {
+                gleam::gl::GlFns::load_with(|symbol| context.get_proc_address(symbol) as *const _)
+            },
+            glutin::Api::OpenGlEs => unsafe {
+                gleam::gl::GlesFns::load_with(|symbol| context.get_proc_address(symbol) as *const _)
+            },
+            glutin::Api::WebGl => unimplemented!(),
+        };
+
+        gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
+
+        ValueBox::new(gl).into_raw()
+    })
 }
 
 #[no_mangle]
