@@ -12954,7 +12954,7 @@ GtGleamGL >> get_attribute_location_program: program name: aGtBoxerString [
 
 { #category : #'api - general' }
 GtGleamGL >> get_error [
-	<return: #GtGleamConstant>
+	<return: #GtGleamGLConstant>
 
 	^ (self class enumsValued: (self primGetError)) first
 ]
