@@ -28,6 +28,13 @@ GtGleamLibrary class >> install [
 	installer run
 ]
 
+{ #category : #'private - ffi' }
+GtGleamLibrary >> calloutAPIClass [
+	^ ThreadedFFIMigration threadedFFIAvailable
+		ifTrue: [ TFCalloutAPI ]
+		ifFalse: [ super calloutAPIClass ]
+]
+
 { #category : #'accessing platform' }
 GtGleamLibrary >> detectLibrary: aFileName [
 	^ ({ Smalltalk imageDirectory . Smalltalk vmDirectory . FileSystem workingDirectory }
@@ -60,6 +67,15 @@ GtGleamLibrary >> macModuleName [
 { #category : #'private - ffi' }
 GtGleamLibrary >> primTest [
 	^ self ffiCall: #(bool gleam_test())
+]
+
+{ #category : #'private - ffi' }
+GtGleamLibrary >> runner [ 
+
+	^ ThreadedFFIMigration threadedFFIAvailable
+		ifTrue: [ TFSameThreadRunner uniqueInstance ]
+		ifFalse: [ super runner ]
+
 ]
 
 { #category : #'accessing platform' }

@@ -12863,6 +12863,12 @@ GtGleamGL >> enable_vertex_attrib_array: index [
 		GLuint index) )
 ]
 
+{ #category : #'private - ffi' }
+GtGleamGL >> ffiLibrary [ 
+
+	^self class ffiLibrary
+]
+
 { #category : #accessing }
 GtGleamGL >> framebufferId [
 	<return: #Number>
