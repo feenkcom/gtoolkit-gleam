@@ -12992,6 +12992,19 @@ GtGleamGL >> get_uniform_location_program: program name: aGtBoxerString [
 		GtBoxerString aGtBoxerString) )
 ]
 
+{ #category : #'gt-extension' }
+GtGleamGL >> gtInfoFor: aView [
+	<gtView>
+
+	^ ({
+		#version -> self version.
+		#shaderVersion -> self shaderVersion.
+		#framebufferId -> self framebufferId
+	 } asOrderedDictionary gtItemsFor: aView)
+			title: 'Info';
+			priority: 2
+]
+
 { #category : #'api - program' }
 GtGleamGL >> link_program: program [
 	^ self ffiCall: #( void gleam_link_program ( self, GLuint program ) )
@@ -13175,8 +13188,8 @@ GtGleamGL >> read_pixels: aRectangle format: aFormat pixelType: aPixelType [
 		y: aRectangle top
 		width: aRectangle width
 		height: aRectangle height
-		format: aFormat
-		pixelType: aPixelType
+		format: aFormat value
+		pixelType: aPixelType value
 		pixels: aGtBoxerArray.
 			
 	^ aGtBoxerArray
