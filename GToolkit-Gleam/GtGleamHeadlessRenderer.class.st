@@ -20,7 +20,7 @@ GtGleamHeadlessRenderer >> gl: anObject [
 
 { #category : #rendering }
 GtGleamHeadlessRenderer >> render: aBlock [
-	| framebuffer depthbuffer |
+	| framebuffer depthbuffer result |
 
 	gl
 		bind_texture: texture id
@@ -65,10 +65,10 @@ GtGleamHeadlessRenderer >> render: aBlock [
 		textureTarget: texture target value
 		texture: texture id
 		level: 0.
-		
+
 	self assert: (gl check_frame_buffer_status: gl GL_FRAMEBUFFER) equals: gl GL_FRAMEBUFFER_COMPLETE.
-	
-	aBlock cull: gl cull: texture.
+
+	result := aBlock cull: gl cull: texture.
 
 	gl delete_framebuffer: framebuffer.
 	gl delete_renderbuffer: depthbuffer.
@@ -76,6 +76,8 @@ GtGleamHeadlessRenderer >> render: aBlock [
 	gl bind_texture: 0 target: gl GL_TEXTURE_2D.
 	gl bind_framebuffer: 0 target: gl GL_FRAMEBUFFER value.
 	gl bind_renderbuffer: 0 target: gl GL_RENDERBUFFER value.
+	
+	^ result
 ]
 
 { #category : #accessing }
