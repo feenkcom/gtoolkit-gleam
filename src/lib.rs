@@ -32,7 +32,7 @@ pub fn gleam_load_gl(
         })
     };
 
-    gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
+    //gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
     ValueBox::new(gl).into_raw()
 }
 
@@ -49,7 +49,7 @@ pub fn gleam_load_gles(
         })
     };
 
-    gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
+    //gl = gleam::gl::ErrorReactingGl::wrap(gl, error_callback);
     ValueBox::new(gl).into_raw()
 }
 
