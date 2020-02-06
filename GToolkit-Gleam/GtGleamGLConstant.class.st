@@ -59,7 +59,7 @@ GtGleamGLConstant >> printOn: aStream [
 
 	aStream
 		nextPutAll: '{ value: ';
-		print: value.
+		nextPutAll: value asString.
 	aStream
 		nextPutAll: ' name: ';
 		nextPutAll: name.
