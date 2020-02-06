@@ -20,6 +20,11 @@ pub fn gleam_link_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) 
 }
 
 #[no_mangle]
+pub fn gleam_delete_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
+    _ptr_gl.with(|gl| gl.delete_program(_program));
+}
+
+#[no_mangle]
 pub fn gleam_get_program_iv(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     program: GLuint,
