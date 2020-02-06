@@ -1,6 +1,5 @@
 extern crate boxer;
 extern crate gleam;
-extern crate libc;
 
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
@@ -10,6 +9,7 @@ use std::rc::Rc;
 
 pub mod gleam_gl;
 pub mod gleam_gl_framebuffer;
+pub mod gleam_gl_program;
 pub mod gleam_gl_renderbuffer;
 pub mod gleam_gl_texture;
 
