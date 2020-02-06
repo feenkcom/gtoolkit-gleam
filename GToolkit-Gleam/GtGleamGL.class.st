@@ -29,6 +29,7 @@ Class {
 	#superclass : #GtBoxerValueBox,
 	#classVars : [
 		'ClearBits',
+		'Errors',
 		'InternalFormats'
 	],
 	#pools : [
@@ -6297,6 +6298,7 @@ GtGleamGL class >> initialize [
 
 	self initializeInternalFormats.
 	self initializeClearBits.
+	self initializeErrors
 ]
 
 { #category : #'class initialization' }
@@ -6308,6 +6310,22 @@ GtGleamGL class >> initializeClearBits [
 		GL_COLOR_BUFFER_BIT
 		GL_DEPTH_BUFFER_BIT
 		GL_STENCIL_BUFFER_BIT)
+]
+
+{ #category : #'class initialization' }
+GtGleamGL class >> initializeErrors [
+	"I initialize possibles values that glGetError can return"
+	"See https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetError.xhtml"
+
+	Errors := self findConstants: #( 
+		GL_NO_ERROR
+		GL_INVALID_ENUM
+		GL_INVALID_VALUE
+		GL_INVALID_OPERATION
+		GL_INVALID_FRAMEBUFFER_OPERATION
+		GL_OUT_OF_MEMORY
+		GL_STACK_UNDERFLOW
+		GL_STACK_OVERFLOW)
 ]
 
 { #category : #'class initialization' }
@@ -12691,8 +12709,8 @@ GtGleamGL >> array_buffer_data_static_draw: array length: length [
 ]
 
 { #category : #'api - shader' }
-GtGleamGL >> attach_shader: shader program: program [
-	^ self ffiCall: #( void gleam_attach_shader ( self, GLuint program, GLuint shader ) )
+GtGleamGL >> attach_shader: aShader program: aProgram [
+	^ self ffiCall: #( void gleam_attach_shader ( self, GLuint aProgram, GLuint aShader ) )
 ]
 
 { #category : #'api - buffer' }
@@ -12765,8 +12783,8 @@ GtGleamGL >> clear_depth: aDepth [
 ]
 
 { #category : #'api - shader' }
-GtGleamGL >> compile_shader: shader [
-	^ self ffiCall: #( void gleam_compile_shader ( self, GLuint shader ) )
+GtGleamGL >> compile_shader: aShader [
+	^ self ffiCall: #( void gleam_compile_shader ( self, GLuint aShader ) )
 ]
 
 { #category : #'api - buffer' }
@@ -12800,6 +12818,11 @@ GtGleamGL >> delete_framebuffers: aCollectionOfTextures [
 		withAll: aCollectionOfTextures
 		during: [ :aGtBoxerArrayUInt | 
 			self primDeleteFramebuffers: aGtBoxerArrayUInt ]
+]
+
+{ #category : #'api - program' }
+GtGleamGL >> delete_program: program [
+	^ self ffiCall: #( void gleam_delete_program ( self, GLuint program ) )
 ]
 
 { #category : #'api - renderbuffer' }
@@ -12951,18 +12974,25 @@ GtGleamGL >> gen_vertex_array [
 ]
 
 { #category : #'api - program' }
-GtGleamGL >> get_attribute_location_program: program name: aGtBoxerString [
-	^ self ffiCall: #( int32 gleam_get_attribute_location (
-		self,
-		GLuint program,
-		GtBoxerString aGtBoxerString) )
+GtGleamGL >> get_attribute_location_program: aProgram name: aString [
+	^ GtBoxerString fromString: aString during: [ :aGtBoxerString |
+		self primGetAttributeLocationProgram: aProgram name: aGtBoxerString ]
 ]
 
 { #category : #'api - general' }
 GtGleamGL >> get_error [
 	<return: #GtGleamGLConstant>
+	| aValue |
+	
+	aValue := self primGetError.
+	
+	"most common case"
+	aValue = self GL_NO_ERROR value
+		ifTrue: [ ^ self GL_NO_ERROR ].
 
-	^ (self class enumsValued: (self primGetError)) first
+	^ Errors
+		detect: [ :eachEnum | eachEnum value = aValue ]
+		ifNone: [ (self class enumsValued: aValue) first ]
 ]
 
 { #category : #'api - accessing' }
@@ -12970,6 +13000,35 @@ GtGleamGL >> get_integer: whichEnum [
 	<return: #Number>
 
 	^ self primGetInteger: whichEnum value
+]
+
+{ #category : #'api - program' }
+GtGleamGL >> get_program_info_log: aProgram [
+	<return: #String>
+	
+	^ GtBoxerString getStringFrom: [ :aGtBoxerString | self primGetProgramInfoLog: aProgram string: aGtBoxerString ]
+]
+
+{ #category : #'api - program' }
+GtGleamGL >> get_program_link_status: aProgram [
+	<return: #Boolean>
+
+	^ GtBoxerArrayInt
+		withAll: { self GL_FALSE value }
+		during: [ :aGtBoxerArrayInt |
+			self primGetProgram: aProgram param: self GL_LINK_STATUS value return: aGtBoxerArrayInt.
+			(aGtBoxerArrayInt at: 1) = self GL_TRUE value ]
+]
+
+{ #category : #'api - program' }
+GtGleamGL >> get_program_validate_status: aProgram [
+	<return: #Boolean>
+
+	^ GtBoxerArrayInt
+		withAll: { self GL_FALSE value }
+		during: [ :aGtBoxerArrayInt |
+			self primGetProgram: aProgram param: self GL_VALIDATE_STATUS value return: aGtBoxerArrayInt.
+			(aGtBoxerArrayInt at: 1) = self GL_TRUE value ]
 ]
 
 { #category : #'api - accessing' }
@@ -13090,6 +13149,14 @@ GtGleamGL >> primGenerateTextures: aGtBoxerArrayUInt amount: aNumber [
 	^ self ffiCall: #( void gleam_gen_textures ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
 ]
 
+{ #category : #'private - ffi program' }
+GtGleamGL >> primGetAttributeLocationProgram: aProgram name: aGtBoxerString [
+	^ self ffiCall: #( int32 gleam_get_attribute_location (
+		self,
+		GLuint aProgram,
+		GtBoxerString aGtBoxerString) )
+]
+
 { #category : #'private - ffi general' }
 GtGleamGL >> primGetError [
 	^ self ffiCall: #(GLenum gleam_get_error(self))
@@ -13098,6 +13165,16 @@ GtGleamGL >> primGetError [
 { #category : #'private - ffi accessing' }
 GtGleamGL >> primGetInteger: which [
 	^ self ffiCall: #( GLint gleam_get_integer ( self, GLenum which) )
+]
+
+{ #category : #'private - ffi program' }
+GtGleamGL >> primGetProgram: aProgram param: aParamName return: aBoxerArrayInt [
+	^ self ffiCall: #(void gleam_get_program_iv(self, GLuint aProgram, GLenum aParamName, GtBoxerArrayInt aBoxerArrayInt))
+]
+
+{ #category : #'private - ffi program' }
+GtGleamGL >> primGetProgramInfoLog: aProgram string: aGtBoxerString [
+	^ self ffiCall: #(void gleam_get_program_info_log(self, GLuint aProgram, GtBoxerString aGtBoxerString))
 ]
 
 { #category : #'private - ffi general' }
@@ -13125,6 +13202,11 @@ GtGleamGL >> primSetTexParameterInt: target name: pname param: param [
 		GLenum target,
 		GLenum pname,
 		GLint param) )
+]
+
+{ #category : #'private - ffi shader' }
+GtGleamGL >> primShaderSource: aShader string: aGtBoxerString [
+	^ self ffiCall: #( void gleam_shader_source ( self, GLuint aShader, GtBoxerString aGtBoxerString ) )
 ]
 
 { #category : #'private - ffi texture' }
@@ -13212,8 +13294,11 @@ GtGleamGL >> shaderVersion [
 ]
 
 { #category : #'api - shader' }
-GtGleamGL >> shader_source: shader string: aGtBoxerString [
-	^ self ffiCall: #( void gleam_shader_source ( self, GLuint shader, GtBoxerString aGtBoxerString ) )
+GtGleamGL >> shader_source: aShader string: aString [
+	GtBoxerString
+		"line endings must corresponds to the platform, otherwise will not compile"
+		fromString: (aString withLineEndings: OSPlatform current lineEnding)
+		during: [ :aGtBoxerString | self primShaderSource: aShader string: aGtBoxerString ]
 ]
 
 { #category : #'api - texture' }
@@ -13276,6 +13361,11 @@ GtGleamGL >> tex_sub_image_2d: aTargetEnum level: level xoffset: xoffset yoffset
 { #category : #'api - program' }
 GtGleamGL >> use_program: program [
 	^ self ffiCall: #( void gleam_use_program ( self, GLuint program ) )
+]
+
+{ #category : #'api - program' }
+GtGleamGL >> validate_program: aProgram [
+	self ffiCall: #(void gleam_validate_program(self, GLuint aProgram))
 ]
 
 { #category : #accessing }
