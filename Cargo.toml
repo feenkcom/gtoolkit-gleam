@@ -7,7 +7,6 @@ edition = "2018"
 
 [dependencies]
 gleam = "0.6.17"
-libc = "0.2.65"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
 
 [build-dependencies]

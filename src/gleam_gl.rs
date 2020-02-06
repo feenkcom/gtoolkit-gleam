@@ -131,23 +131,8 @@ pub fn gleam_shader_source(
 }
 
 #[no_mangle]
-pub fn gleam_create_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.create_program())
-}
-
-#[no_mangle]
 pub fn gleam_attach_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint, _shader: GLuint) {
     _ptr_gl.with(|gl| gl.attach_shader(_program, _shader));
-}
-
-#[no_mangle]
-pub fn gleam_link_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
-    _ptr_gl.with(|gl| gl.link_program(_program));
-}
-
-#[no_mangle]
-pub fn gleam_use_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
-    _ptr_gl.with(|gl| gl.use_program(_program));
 }
 
 #[no_mangle]
