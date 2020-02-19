@@ -12,6 +12,7 @@ pub mod gleam_gl_framebuffer;
 pub mod gleam_gl_program;
 pub mod gleam_gl_renderbuffer;
 pub mod gleam_gl_texture;
+pub mod gleam_gl_uniform;
 
 include!(concat!(env!("OUT_DIR"), "/gl_enums.rs"));
 
