@@ -14,11 +14,11 @@ BaselineOfGToolkitGleam >> baseline: spec [
 		spec postLoadDoIt: #'postLoadGleam:'.
 		spec 
 			baseline: 'GToolkitInstaller' with: [
-				spec repository: 'github://feenkcom/gtoolkit-installer:v0.7.13/src' ];
+				spec repository: 'github://feenkcom/gtoolkit-installer:v0.7.14/src' ];
 			baseline: 'GToolkitBoxer' with: [
-				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.6.66/src' ];
+				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.6.67/src' ];
 			baseline: 'GtThreadedFFIDev' with: [
-				spec repository: 'github://feenkcom/tffi-dev:v0.6.12/src' ].
+				spec repository: 'github://feenkcom/tffi-dev:v0.6.13/src' ].
 		spec package: 'GToolkit-Gleam' with: [
 				spec requires: #(#GToolkitInstaller #GToolkitBoxer #GtThreadedFFIDev ). ]. ].
 
