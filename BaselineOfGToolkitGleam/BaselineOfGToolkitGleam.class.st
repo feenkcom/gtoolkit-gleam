@@ -18,7 +18,7 @@ BaselineOfGToolkitGleam >> baseline: spec [
 			baseline: 'GToolkitBoxer' with: [
 				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.6.67/src' ];
 			baseline: 'GtThreadedFFIDev' with: [
-				spec repository: 'github://feenkcom/tffi-dev:v0.6.13/src' ].
+				spec repository: 'github://feenkcom/tffi-dev:v0.6.14/src' ].
 		spec package: 'GToolkit-Gleam' with: [
 				spec requires: #(#GToolkitInstaller #GToolkitBoxer #GtThreadedFFIDev ). ]. ].
 
