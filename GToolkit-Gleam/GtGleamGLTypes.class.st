@@ -43,7 +43,7 @@ GtGleamGLTypes class >> initialize [
 	"
 	self initialize
 	"
-	GLfloat := #FFIFloat32.
+	GLfloat := #float.
 	GLdouble := #FFIFloat64.
 	GLclampd := #FFIFloat64.
 	GLclampf := #FFIFloat32.

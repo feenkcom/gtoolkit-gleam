@@ -13044,11 +13044,9 @@ GtGleamGL >> get_string: whichEnum [
 ]
 
 { #category : #'api - program' }
-GtGleamGL >> get_uniform_location_program: program name: aGtBoxerString [
-	^ self ffiCall: #( int32 gleam_get_uniform_location (
-		self,
-		GLuint program,
-		GtBoxerString aGtBoxerString) )
+GtGleamGL >> get_uniform_location_program: aProgram name: aString [
+	^ GtBoxerString fromString: aString during: [ :aGtBoxerString |
+		self primGetUniformLocationProgram: aProgram name: aGtBoxerString ]
 ]
 
 { #category : #'gt-extension' }
@@ -13180,6 +13178,14 @@ GtGleamGL >> primGetProgramInfoLog: aProgram string: aGtBoxerString [
 { #category : #'private - ffi general' }
 GtGleamGL >> primGetString: which in: aGtBoxerString [
 	^ self ffiCall: #( void gleam_get_string ( self, GLenum which, GtBoxerString aGtBoxerString) )
+]
+
+{ #category : #'private - ffi program' }
+GtGleamGL >> primGetUniformLocationProgram: program name: aGtBoxerString [
+	^ self ffiCall: #( int32 gleam_get_uniform_location (
+		self,
+		GLuint program,
+		GtBoxerString aGtBoxerString) )
 ]
 
 { #category : #'private - ffi general' }
@@ -13356,6 +13362,16 @@ GtGleamGL >> tex_sub_image_2d: aTargetEnum level: level xoffset: xoffset yoffset
 		format: aFormatEnum value
 		type: aPixelTypeEnum value
 		pixels: aGtBoxerArrayU8
+]
+
+{ #category : #'api - uniform' }
+GtGleamGL >> uniform_2f: aLocation v0: aFirstValue v1: aSecondValue [
+	^ self ffiCall: #(void gleam_uniform_2f(self, GLint aLocation, GLfloat aFirstValue, GLfloat aSecondValue))
+]
+
+{ #category : #'api - uniform' }
+GtGleamGL >> uniform_matrix_4fv: aLocation transpose: shouldTranspose values: aGtBoxerArrayF32 [
+	^ self ffiCall: #(void gleam_uniform_matrix_4fv(self, GLint aLocation, bool shouldTranspose, GtBoxerArrayF32 aGtBoxerArrayF32))
 ]
 
 { #category : #'api - program' }
