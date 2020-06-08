@@ -18,7 +18,7 @@ GtGleamLoadCallback class >> fnSpec [
 { #category : #'instance creation' }
 GtGleamLoadCallback class >> on: aBlock [
 	^ self 
-		signature: self fnSpec 
+		newCallbackWithSignature: self fnSpec 
 		block: aBlock
 ]
 
