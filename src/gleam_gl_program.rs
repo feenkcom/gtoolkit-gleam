@@ -1,6 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::string::BoxerString;
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -41,7 +41,7 @@ pub fn gleam_get_program_iv(
 pub fn gleam_get_program_info_log(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     program: GLuint,
-    _ptr_string: *mut BoxerString,
+    _ptr_string: *mut ValueBox<BoxerString>,
 ) {
     _ptr_gl.with_not_null(|gl| {
         _ptr_string.with_not_null(|string| string.set_string(gl.get_program_info_log(program)))

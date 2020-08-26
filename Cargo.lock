@@ -3,7 +3,10 @@
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer#f09e0a9450e2c52fe146095fde8379b0c402bc5f"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=a79e2fd8003527ac52ddb7bc9968e5e7ead70448#a79e2fd8003527ac52ddb7bc9968e5e7ead70448"
+dependencies = [
+ "widestring",
+]
 
 [[package]]
 name = "cfg-if"
@@ -65,6 +68,12 @@ checksum = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
 dependencies = [
  "cfg-if",
 ]
+
+[[package]]
+name = "widestring"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a763e303c0e0f23b0da40888724762e802a8ffefbc22de4127ef42493c2ea68c"
 
 [[package]]
 name = "xml-rs"
