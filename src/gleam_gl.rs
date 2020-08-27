@@ -1,7 +1,7 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::{BoxerString, BoxerStringPointer};
-use boxer::{assert_box, function, CBox};
+use boxer::string::BoxerString;
+use boxer::{assert_box, function};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -39,7 +39,7 @@ pub fn gleam_get_error(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLenum {
 pub fn gleam_get_string(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     which: GLenum,
-    _ptr_string: *mut BoxerString,
+    _ptr_string: *mut ValueBox<BoxerString>,
 ) {
     assert_box(_ptr_gl, function!());
     _ptr_gl.with_not_null(|gl| {
@@ -120,10 +120,10 @@ pub fn gleam_compile_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _shader: GLuint)
 pub fn gleam_shader_source(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     _shader: GLuint,
-    _ptr_source: *mut BoxerString,
+    _ptr_source: *mut ValueBox<BoxerString>,
 ) {
     _ptr_gl.with(|gl| {
-        CBox::with_raw(_ptr_source, |source| {
+        _ptr_source.with_not_null(|source| {
             let source_string = source.to_string();
             gl.shader_source(_shader, &[source_string.as_bytes()]);
         });
@@ -178,10 +178,10 @@ pub fn gleam_array_buffer_data_static_draw(
 pub fn gleam_get_attribute_location(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     program: GLuint,
-    _ptr_location: *mut BoxerString,
+    _ptr_location: *mut ValueBox<BoxerString>,
 ) -> i32 {
     _ptr_gl.with(|gl| {
-        CBox::with_raw(_ptr_location, |location| {
+        _ptr_location.with_not_null_return(0, |location| {
             gl.get_attrib_location(program, location.to_string().as_ref())
         })
     })
@@ -191,10 +191,10 @@ pub fn gleam_get_attribute_location(
 pub fn gleam_get_uniform_location(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     program: GLuint,
-    _ptr_location: *mut BoxerString,
+    _ptr_location: *mut ValueBox<BoxerString>,
 ) -> i32 {
     _ptr_gl.with(|gl| {
-        CBox::with_raw(_ptr_location, |location| {
+        _ptr_location.with_not_null_return(0, |location| {
             gl.get_uniform_location(program, location.to_string().as_ref())
         })
     })

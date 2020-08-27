@@ -37,7 +37,6 @@ fn main() {
 
     let _ = file_gl.write_all(
         "use gleam::gl::*;
-use boxer::string::{BoxerStringPointer};
 
 "
         .as_bytes(),
@@ -70,7 +69,7 @@ use boxer::string::{BoxerStringPointer};
 
     let _ = file_gl.write_all("
 #[no_mangle]
-pub fn gleam_enum_get_at_gl(_ptr_ident: *mut BoxerString, _ptr_value: *mut BoxerString, _ptr_type: *mut BoxerString, index: usize) {
+pub fn gleam_enum_get_at_gl(_ptr_ident: *mut ValueBox<BoxerString>, _ptr_value: *mut ValueBox<BoxerString>, _ptr_type: *mut ValueBox<BoxerString>, index: usize) {
     let each_enum = GL_ENUMS[index];
     _ptr_ident.with_not_null(|string| string.set_string(String::from(each_enum.0)));
     _ptr_value.with_not_null(|string| string.set_string(String::from(each_enum.1)));
@@ -106,7 +105,7 @@ pub fn gleam_enum_gl_{}() -> {} {{ {} }}
             format!(
                 "
 #[no_mangle]
-pub fn gleam_enum_type_gl_{}(_ptr_string: *mut BoxerString) {{
+pub fn gleam_enum_type_gl_{}(_ptr_string: *mut ValueBox<BoxerString>) {{
     _ptr_string.with_not_null(|string| string.set_string(String::from({:?})) )
 }}
 ",
