@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -51,7 +51,7 @@ pub fn gleam_check_frame_buffer_status(
     _ptr_gl: *mut ValueBox<Rc<dyn Gl>>,
     target: GLenum,
 ) -> GLenum {
-    _ptr_gl.with(|gl| gl.check_frame_buffer_status(target))
+    _ptr_gl.with_not_null_return(0, |gl| gl.check_frame_buffer_status(target))
 }
 
 #[no_mangle]
@@ -69,7 +69,7 @@ fn gleam_delete_framebuffers(
 ///////////////////////////////////////////////////////////////////////////////////////
 #[no_mangle]
 pub fn gleam_gen_framebuffer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.gen_framebuffers(1)[0])
+    _ptr_gl.with_not_null_return(0, |gl| gl.gen_framebuffers(1)[0])
 }
 
 #[no_mangle]

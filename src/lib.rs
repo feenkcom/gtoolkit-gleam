@@ -1,8 +1,8 @@
 extern crate boxer;
 extern crate gleam;
 
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use std::os::raw::c_void;
 use std::rc::Rc;
 
@@ -21,10 +21,10 @@ pub fn gleam_load_gl(
 ) -> *mut ValueBox<Rc<dyn gleam::gl::Gl>> {
     let gl = unsafe {
         gleam::gl::GlFns::load_with(|symbol| {
-            let boxer_string =
+            let mut boxer_string =
                 ValueBox::new(BoxerString::from_string(symbol.to_string())).into_raw();
             let func_ptr = callback(boxer_string);
-            boxer_string.drop();
+            (&mut boxer_string).drop();
             func_ptr
         })
     };
@@ -37,10 +37,10 @@ pub fn gleam_load_gles(
 ) -> *mut ValueBox<Rc<dyn gleam::gl::Gl>> {
     let gl = unsafe {
         gleam::gl::GlFns::load_with(|symbol| {
-            let boxer_string =
+            let mut boxer_string =
                 ValueBox::new(BoxerString::from_string(symbol.to_string())).into_raw();
             let func_ptr = callback(boxer_string);
-            boxer_string.drop();
+            (&mut boxer_string).drop();
             func_ptr
         })
     };
@@ -48,8 +48,8 @@ pub fn gleam_load_gles(
 }
 
 #[no_mangle]
-pub fn gleam_drop(_ptr: *mut ValueBox<Rc<dyn gleam::gl::Gl>>) {
-    _ptr.drop()
+pub fn gleam_drop(_ptr: &mut *mut ValueBox<Rc<dyn gleam::gl::Gl>>) {
+    _ptr.drop();
 }
 
 #[no_mangle]

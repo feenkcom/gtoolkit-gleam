@@ -2,9 +2,10 @@
 # It is not intended for manual editing.
 [[package]]
 name = "boxer"
-version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=a79e2fd8003527ac52ddb7bc9968e5e7ead70448#a79e2fd8003527ac52ddb7bc9968e5e7ead70448"
+version = "0.2.0"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4#8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4"
 dependencies = [
+ "log",
  "widestring",
 ]
 
