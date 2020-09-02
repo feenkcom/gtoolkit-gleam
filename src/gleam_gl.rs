@@ -1,7 +1,7 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
 use boxer::{assert_box, function};
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -32,7 +32,7 @@ pub fn gleam_clear(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, buffer_mask: GLbitfield) 
 
 #[no_mangle]
 pub fn gleam_get_error(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLenum {
-    _ptr_gl.with(|gl| gl.get_error())
+    _ptr_gl.with_not_null_return(0, |gl| gl.get_error())
 }
 
 #[no_mangle]
@@ -97,17 +97,17 @@ pub fn gleam_get_shader_version(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> u32 {
 
 #[no_mangle]
 pub fn gleam_create_vertex_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.create_shader(VERTEX_SHADER))
+    _ptr_gl.with_not_null_return(0, |gl| gl.create_shader(VERTEX_SHADER))
 }
 
 #[no_mangle]
 pub fn gleam_create_fragment_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.create_shader(FRAGMENT_SHADER))
+    _ptr_gl.with_not_null_return(0, |gl| gl.create_shader(FRAGMENT_SHADER))
 }
 
 #[no_mangle]
 pub fn gleam_compile_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _shader: GLuint) {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null(|gl| {
         gl.compile_shader(_shader);
         let log = gl.get_shader_info_log(_shader);
         if !log.is_empty() {
@@ -122,7 +122,7 @@ pub fn gleam_shader_source(
     _shader: GLuint,
     _ptr_source: *mut ValueBox<BoxerString>,
 ) {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null(|gl| {
         _ptr_source.with_not_null(|source| {
             let source_string = source.to_string();
             gl.shader_source(_shader, &[source_string.as_bytes()]);
@@ -132,7 +132,7 @@ pub fn gleam_shader_source(
 
 #[no_mangle]
 pub fn gleam_attach_shader(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint, _shader: GLuint) {
-    _ptr_gl.with(|gl| gl.attach_shader(_program, _shader));
+    _ptr_gl.with_not_null(|gl| gl.attach_shader(_program, _shader));
 }
 
 #[no_mangle]
@@ -143,17 +143,17 @@ pub fn gleam_viewport(
     width: GLsizei,
     height: GLsizei,
 ) {
-    _ptr_gl.with(|gl| gl.viewport(x, y, width, height));
+    _ptr_gl.with_not_null(|gl| gl.viewport(x, y, width, height));
 }
 
 #[no_mangle]
 pub fn gleam_create_buffer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.gen_buffers(1)[0])
+    _ptr_gl.with_not_null_return(0, |gl| gl.gen_buffers(1)[0])
 }
 
 #[no_mangle]
 pub fn gleam_bind_array_buffer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, buffer: GLuint) {
-    _ptr_gl.with(|gl| gl.bind_buffer(ARRAY_BUFFER, buffer));
+    _ptr_gl.with_not_null(|gl| gl.bind_buffer(ARRAY_BUFFER, buffer));
 }
 
 #[no_mangle]
@@ -162,7 +162,7 @@ pub fn gleam_array_buffer_data_static_draw(
     array: *const f32,
     length: u32,
 ) {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null(|gl| {
         let data: &[f32] = unsafe { std::slice::from_raw_parts(array, length as usize) };
 
         gl.buffer_data_untyped(
@@ -180,7 +180,7 @@ pub fn gleam_get_attribute_location(
     program: GLuint,
     _ptr_location: *mut ValueBox<BoxerString>,
 ) -> i32 {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null_return(0, |gl| {
         _ptr_location.with_not_null_return(0, |location| {
             gl.get_attrib_location(program, location.to_string().as_ref())
         })
@@ -193,7 +193,7 @@ pub fn gleam_get_uniform_location(
     program: GLuint,
     _ptr_location: *mut ValueBox<BoxerString>,
 ) -> i32 {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null_return(0, |gl| {
         _ptr_location.with_not_null_return(0, |location| {
             gl.get_uniform_location(program, location.to_string().as_ref())
         })
@@ -202,17 +202,17 @@ pub fn gleam_get_uniform_location(
 
 #[no_mangle]
 pub fn gleam_gen_vertex_array(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.gen_vertex_arrays(1)[0])
+    _ptr_gl.with_not_null_return(0, |gl| gl.gen_vertex_arrays(1)[0])
 }
 
 #[no_mangle]
 pub fn gleam_bind_vertex_array(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, vao: GLuint) {
-    _ptr_gl.with(|gl| gl.bind_vertex_array(vao));
+    _ptr_gl.with_not_null(|gl| gl.bind_vertex_array(vao));
 }
 
 #[no_mangle]
 pub fn gleam_enable_vertex_attrib_array(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, index: GLuint) {
-    _ptr_gl.with(|gl| gl.enable_vertex_attrib_array(index));
+    _ptr_gl.with_not_null(|gl| gl.enable_vertex_attrib_array(index));
 }
 
 #[no_mangle]
@@ -225,7 +225,9 @@ pub fn gleam_vertex_attrib_pointer(
     stride: GLsizei,
     offset: GLuint,
 ) {
-    _ptr_gl.with(|gl| gl.vertex_attrib_pointer(index, size, type_, normalized, stride, offset));
+    _ptr_gl.with_not_null(|gl| {
+        gl.vertex_attrib_pointer(index, size, type_, normalized, stride, offset)
+    });
 }
 
 #[no_mangle]
@@ -235,12 +237,12 @@ pub fn gleam_draw_arrays(
     first: GLint,
     count: GLsizei,
 ) {
-    _ptr_gl.with(|gl| gl.draw_arrays(mode, first, count));
+    _ptr_gl.with_not_null(|gl| gl.draw_arrays(mode, first, count));
 }
 
 #[no_mangle]
 pub fn gleam_get_integer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, name: GLenum) -> GLint {
-    _ptr_gl.with(|gl| {
+    _ptr_gl.with_not_null_return(0, |gl| {
         let mut result: [GLint; 1] = [0; 1];
         unsafe { gl.get_integer_v(name, &mut result) };
         result[0]

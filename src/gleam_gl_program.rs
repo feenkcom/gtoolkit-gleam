@@ -1,27 +1,27 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
 #[no_mangle]
 pub fn gleam_create_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.create_program())
+    _ptr_gl.with_not_null_return(0, |gl| gl.create_program())
 }
 
 #[no_mangle]
 pub fn gleam_use_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
-    _ptr_gl.with(|gl| gl.use_program(_program));
+    _ptr_gl.with_not_null(|gl| gl.use_program(_program));
 }
 
 #[no_mangle]
 pub fn gleam_link_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
-    _ptr_gl.with(|gl| gl.link_program(_program));
+    _ptr_gl.with_not_null(|gl| gl.link_program(_program));
 }
 
 #[no_mangle]
 pub fn gleam_delete_program(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>, _program: GLuint) {
-    _ptr_gl.with(|gl| gl.delete_program(_program));
+    _ptr_gl.with_not_null(|gl| gl.delete_program(_program));
 }
 
 #[no_mangle]

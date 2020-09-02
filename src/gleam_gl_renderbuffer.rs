@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -49,7 +49,7 @@ fn gleam_delete_renderbuffers(
 ///////////////////////////////////////////////////////////////////////////////////////
 #[no_mangle]
 pub fn gleam_gen_renderbuffer(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.gen_renderbuffers(1)[0])
+    _ptr_gl.with_not_null_return(0, |gl| gl.gen_renderbuffers(1)[0])
 }
 
 #[no_mangle]

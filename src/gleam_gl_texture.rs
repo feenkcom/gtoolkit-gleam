@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
@@ -31,7 +31,7 @@ pub fn gleam_tex_parameter_i(
     pname: GLenum,
     param: GLint,
 ) {
-    _ptr_gl.with(|gl| gl.tex_parameter_i(target, pname, param));
+    _ptr_gl.with_not_null(|gl| gl.tex_parameter_i(target, pname, param));
 }
 
 #[no_mangle]
@@ -57,7 +57,7 @@ pub fn gleam_tex_image_2d(
     _ptr_data: *mut ValueBox<BoxerArray<u8>>,
 ) {
     _ptr_gl.with_not_null(|gl| {
-        _ptr_data.with_not_null_return_block(
+        _ptr_data.with(
             || {
                 gl.tex_image_2d(
                     target,
@@ -124,7 +124,7 @@ pub fn gleam_tex_sub_image_2d(
 
 #[no_mangle]
 pub fn gleam_gen_texture(_ptr_gl: *mut ValueBox<Rc<dyn Gl>>) -> GLuint {
-    _ptr_gl.with(|gl| gl.gen_textures(1)[0])
+    _ptr_gl.with_not_null_return(0, |gl| gl.gen_textures(1)[0])
 }
 
 #[no_mangle]

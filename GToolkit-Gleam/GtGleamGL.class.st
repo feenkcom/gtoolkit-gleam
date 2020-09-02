@@ -6478,7 +6478,7 @@ GtGleamGL class >> primLoaderCallbackFor: aBlock [
 GtGleamGL class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
-	^ self ffiCall: #(void gleam_drop(void* aHandle))
+	^ self ffiCall: #(void gleam_drop(void** aHandle))
 ]
 
 { #category : #'api - enums' }

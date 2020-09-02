@@ -1,5 +1,5 @@
 use boxer::array::BoxerArrayF32;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use gleam::gl::*;
 use std::rc::Rc;
 
