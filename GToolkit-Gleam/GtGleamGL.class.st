@@ -1,6 +1,6 @@
 "
 My constants are generated using:
-[[[
+```
 			
 GtGleamGLConstants classPool keys do: [ :eachName |
 	GtGleamGL class compile: (String streamContents: [ :aStream |
@@ -22,7 +22,9 @@ GtGleamGLConstants classPool keys do: [ :eachName |
 			nextPutAll: eachName
 	])  classified: 'api - enums' ].
 
-]]]
+```
+
+
 "
 Class {
 	#name : #GtGleamGL,

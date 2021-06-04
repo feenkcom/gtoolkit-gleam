@@ -1,16 +1,17 @@
 "
 Constant data is generated with:
 
-[[[
-| enums |
-enums := GtGleamGL allEnums collect: [ :eachEnum | '		#(', eachEnum name, ' ', eachEnum value asString, ' ', eachEnum type, ')' ].
+```
+enumsenums := GtGleamGL allEnums collect: [ :eachEnum | '		#(', eachEnum name, ' ', eachEnum value asString, ' ', eachEnum type, ')' ].
 GtGleamGLConstants class compile: ('constantData
 	^ #(
 {1}
 	)' format: {
 		String streamContents: [ :aStream | enums do: [ :eachEnum | aStream nextPutAll: eachEnum ] separatedBy: [ aStream cr ] ]
 	}) classified: 'constant data'.
-]]]
+```
+
+
 "
 Class {
 	#name : #GtGleamGLConstants,
