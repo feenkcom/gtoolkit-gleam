@@ -35,9 +35,11 @@ GtGleamLibrary >> calloutAPIClass [
 		ifFalse: [ super calloutAPIClass ]
 ]
 
-{ #category : #'accessing platform' }
+{ #category : #'api - library' }
 GtGleamLibrary >> detectLibrary: aFileName [
-	^ ({ Smalltalk imageDirectory . Smalltalk vmDirectory . FileSystem workingDirectory }
+	"Pharo9 introduced a platform specific FFILibraryFinder which should be used instead of this custom implementation"
+
+	^ ({ Smalltalk imageDirectory . Smalltalk vmDirectory . Smalltalk vmBinary parent / 'Plugins'. FileSystem workingDirectory }
 		collect: [ :aPath | aPath asFileReference / aFileName ])
 			detect: #exists
 			ifFound: #fullName
@@ -59,9 +61,12 @@ GtGleamLibrary >> hasModule [
 	^ aResult ifNil: [ false ]
 ]
 
-{ #category : #'accessing platform' }
-GtGleamLibrary >> macModuleName [
-	^ self detectLibrary: 'libGleam.dylib'
+{ #category : #'api - library' }
+GtGleamLibrary >> macLibraryName [
+	^ self class environment
+		at: #FFIMacLibraryFinder
+		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.dylib' ]
+		ifAbsent: [ self detectLibrary: 'libGleam.dylib' ]
 ]
 
 { #category : #'private - ffi' }
@@ -78,12 +83,26 @@ GtGleamLibrary >> runner [
 
 ]
 
-{ #category : #'accessing platform' }
-GtGleamLibrary >> unixModuleName [
-	^ self detectLibrary: 'libGleam.so'
+{ #category : #'api - library' }
+GtGleamLibrary >> unix32LibraryName [
+	^ self class environment
+		at: #FFIUnix32LibraryFinder
+		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.so' ]
+		ifAbsent: [ self detectLibrary: 'libGleam.so' ]
 ]
 
-{ #category : #'accessing platform' }
-GtGleamLibrary >> win32ModuleName [
-	^ self detectLibrary: 'libGleam.dll'
+{ #category : #'api - library' }
+GtGleamLibrary >> unix64LibraryName [
+	^ self class environment
+		at: #FFIUnix64LibraryFinder
+		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.so' ]
+		ifAbsent: [ self detectLibrary: 'libGleam.so' ]
+]
+
+{ #category : #'api - library' }
+GtGleamLibrary >> win32LibraryName [
+	^ self class environment
+		at: #FFIWindowsLibraryFinder
+		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.dll' ]
+		ifAbsent: [ self detectLibrary: 'libGleam.dll' ]
 ]
