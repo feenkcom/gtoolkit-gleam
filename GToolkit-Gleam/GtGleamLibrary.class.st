@@ -109,6 +109,6 @@ GtGleamLibrary >> unix64LibraryName [
 GtGleamLibrary >> win32LibraryName [
 	^ self class environment
 		at: #FFIWindowsLibraryFinder
-		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.dll' ]
+		ifPresent: [ :aLibraryFinder | aLibraryFinder findAnyLibrary: #('Gleam.dll' 'libGleam.dll') ]
 		ifAbsent: [ self detectLibrary: 'libGleam.dll' ]
 ]
