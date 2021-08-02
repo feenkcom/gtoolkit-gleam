@@ -7,17 +7,19 @@ Class {
 	#category : #BaselineOfGToolkitGleam
 }
 
-{ #category : #baselines }
+{ #category : #baseline }
 BaselineOfGToolkitGleam >> baseline: spec [
 	<baseline>
-	spec for: #common do: [
-		spec
-			baseline: 'GToolkitInstaller' with: [ spec repository: 'github://feenkcom/gtoolkit-installer/src' ];
-			baseline: 'GToolkitBoxer' with: [ spec repository: 'github://feenkcom/gtoolkit-boxer/boxer-bindings' ].
-		spec
-			postLoadDoIt: #'postLoadGleam:';
-			package: 'GToolkit-Gleam' with: [ spec requires: 
-				#(GToolkitInstaller GToolkitBoxer) ] ]
+	spec for: #'common' do: [
+		spec postLoadDoIt: #'postLoadGleam:'.
+		spec 
+			baseline: 'GToolkitInstaller' with: [
+				spec repository: 'github://feenkcom/gtoolkit-installer:main/src' ];
+			baseline: 'GToolkitBoxer' with: [
+				spec repository: 'github://feenkcom/gtoolkit-boxer:main/boxer-bindings' ].
+		spec package: 'GToolkit-Gleam' with: [
+				spec requires: #('GToolkitInstaller' 'GToolkitBoxer' ). ]. ].
+
 ]
 
 { #category : #baselines }
