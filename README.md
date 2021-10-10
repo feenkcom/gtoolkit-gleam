@@ -1,4 +1,4 @@
-# GToolkit-Gleam ![](https://github.com/feenkcom/gtoolkit-gleam/workflows/Cargo%20Build/badge.svg)
+# GToolkit-Gleam
 Pharo bindings for [Gleam](https://github.com/servo/gleam) - OpenGL bindings and wrapper for Servo.
 
 ## Installation
