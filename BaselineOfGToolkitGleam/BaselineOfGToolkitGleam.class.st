@@ -1,30 +1,30 @@
 Class {
-	#name : 'BaselineOfGToolkitGleam',
-	#superclass : 'BaselineOf',
+	#name : #BaselineOfGToolkitGleam,
+	#superclass : #BaselineOf,
 	#classVars : [
 		'PostLoaded'
 	],
-	#category : 'BaselineOfGToolkitGleam'
+	#category : #BaselineOfGToolkitGleam
 }
 
-{ #category : 'baseline' }
+{ #category : #baseline }
 BaselineOfGToolkitGleam >> baseline: spec [
 	<baseline>
 	spec for: #'common' do: [
 		spec postLoadDoIt: #'postLoadGleam:'.
 		spec
 			baseline: 'GToolkitInstaller' with: [
-				spec repository: 'github://feenkcom/gtoolkit-installer:v0.8.8/src' ].
+				spec repository: 'github://feenkcom/gtoolkit-installer:v0.8.9/src' ].
 		spec
 			baseline: 'GToolkitBoxer' with: [
-				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.18/boxer-bindings' ].
+				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.19/boxer-bindings' ].
 
 		spec package: 'GToolkit-Gleam' with: [
 			spec requires: #('GToolkitInstaller' 'GToolkitBoxer') ].
 	]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGToolkitGleam >> postLoadGleam: spec [
 	(PostLoaded isNotNil and: [ PostLoaded ])
 		ifTrue: [ ^ self ].
@@ -33,7 +33,7 @@ BaselineOfGToolkitGleam >> postLoadGleam: spec [
 	self postLoadInstallGleamBinary: spec
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGToolkitGleam >> postLoadInstallGleamBinary: aSpec [
 	(self class environment at: #GtGleamLibrary) install
 ]
