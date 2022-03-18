@@ -6281,7 +6281,7 @@ GtGleamGL class >> enumsValued: aNumber [
 ]
 
 { #category : #'library path' }
-GtGleamGL class >> ffiLibraryName [
+GtGleamGL class >> ffiLibrary [
 	^ GtGleamLibrary
 ]
 
@@ -12886,12 +12886,6 @@ GtGleamGL >> enable_vertex_attrib_array: index [
 	^ self ffiCall: #( void gleam_enable_vertex_attrib_array (
 		self,
 		GLuint index) )
-]
-
-{ #category : #'private - ffi' }
-GtGleamGL >> ffiLibrary [ 
-
-	^self class ffiLibrary
 ]
 
 { #category : #accessing }
