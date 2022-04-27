@@ -17,7 +17,7 @@ BaselineOfGToolkitGleam >> baseline: spec [
 				spec repository: 'github://feenkcom/gtoolkit-installer:v0.8.15/src' ].
 		spec
 			baseline: 'GToolkitBoxer' with: [
-				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.30/boxer-bindings' ].
+				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.31/boxer-bindings' ].
 
 		spec package: 'GToolkit-Gleam' with: [
 			spec requires: #('GToolkitInstaller' 'GToolkitBoxer') ].
