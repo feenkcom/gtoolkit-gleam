@@ -6,7 +6,7 @@ Class {
 		'value',
 		'type'
 	],
-	#category : #'GToolkit-Gleam'
+	#category : #'GToolkit-Gleam-Constants'
 }
 
 { #category : #'instance creation' }

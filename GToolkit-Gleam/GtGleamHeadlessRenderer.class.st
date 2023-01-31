@@ -35,7 +35,7 @@ GtGleamHeadlessRenderer >> render: aBlock [
 		border: 0
 		format: texture format
 		type: texture type
-		pixels: GtBoxerArrayU8 null.
+		pixels: ExternalAddress null.
 
 	framebuffer := gl gen_framebuffer.
 	gl bind_framebuffer: framebuffer target: gl GL_FRAMEBUFFER value.

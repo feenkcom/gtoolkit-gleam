@@ -1,14 +1,10 @@
 Class {
 	#name : #GtGleamLoadCallback,
 	#superclass : #FFICallback,
-	#category : #'GToolkit-Gleam'
+	#traits : 'TGtGleamLibrary',
+	#classTraits : 'TGtGleamLibrary classTrait',
+	#category : #'GToolkit-Gleam-External'
 }
-
-{ #category : #'private - ffi' }
-GtGleamLoadCallback class >> ffiLibrary [
-
-	^ GtGleamLibrary
-]
 
 { #category : #'callback spec' }
 GtGleamLoadCallback class >> fnSpec [
@@ -20,17 +16,6 @@ GtGleamLoadCallback class >> on: aBlock [
 	^ self 
 		newCallbackWithSignature: self fnSpec 
 		block: aBlock
-]
-
-{ #category : #'private - ffi' }
-GtGleamLoadCallback >> calloutAPIClass [
-	^ self class environment
-		at: #ThreadedFFIMigration
-		ifPresent: [ :aThreadedFFIMigration |
-			aThreadedFFIMigration threadedFFIAvailable
-				ifTrue: [ self class environment at: #TFCalloutAPI ]
-				ifFalse: [ super calloutAPIClass ] ]
-		ifAbsent: [ super calloutAPIClass ]
 ]
 
 { #category : #'private - ffi' }

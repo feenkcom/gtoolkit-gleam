@@ -1,42 +1,14 @@
 Class {
 	#name : #GtGleamLibrary,
 	#superclass : #FFILibrary,
-	#classInstVars : [
-		'MouseWheelScrollSpeed'
-	],
-	#category : #'GToolkit-Gleam'
+	#traits : 'TGtWithStringBox + TGtWithArrayBoxU8 + TGtWithArrayBoxInt + TGtWithArrayBoxUInt + TGtWithArrayBoxF32',
+	#classTraits : 'TGtWithStringBox classTrait + TGtWithArrayBoxU8 classTrait + TGtWithArrayBoxInt classTrait + TGtWithArrayBoxUInt classTrait + TGtWithArrayBoxF32 classTrait',
+	#category : #'GToolkit-Gleam-Library'
 }
 
 { #category : #'library path' }
-GtGleamLibrary class >> ffiLibraryName [
+GtGleamLibrary class >> ffiLibrary [
 	^ self
-]
-
-{ #category : #installation }
-GtGleamLibrary class >> install [
-	<script: 'self install'>
-	| installer |
-
-	installer := GtLibraryInstaller new.
-	installer library: 'Gleam'.
-	installer version: 'development'.
-	installer icon: (Form extent: 1@1 depth: 32).
-	installer binary: 'libGleam'.
-	installer url: 'https://dl.feenk.com/{library}/{platform}/{version}/{arch}/{binary}.{extension}'.
-	installer works: [ GtGleamLibrary uniqueInstance hasModule ].
-
-	installer run
-]
-
-{ #category : #'private - ffi' }
-GtGleamLibrary >> calloutAPIClass [
-	^ self class environment
-		at: #ThreadedFFIMigration
-		ifPresent: [ :aThreadedFFIMigration |
-			aThreadedFFIMigration threadedFFIAvailable
-				ifTrue: [ self class environment at: #TFCalloutAPI ]
-				ifFalse: [ super calloutAPIClass ] ]
-		ifAbsent: [ super calloutAPIClass ]
 ]
 
 { #category : #'api - library' }
@@ -67,10 +39,7 @@ GtGleamLibrary >> hasModule [
 
 { #category : #'api - library' }
 GtGleamLibrary >> macLibraryName [
-	^ self class environment
-		at: #FFIMacLibraryFinder
-		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.dylib' ]
-		ifAbsent: [ self detectLibrary: 'libGleam.dylib' ]
+	^ FFIMacLibraryFinder findLibrary: 'libGleam.dylib'
 ]
 
 { #category : #'private - ffi' }
@@ -78,37 +47,17 @@ GtGleamLibrary >> primTest [
 	^ self ffiCall: #(bool gleam_test())
 ]
 
-{ #category : #'private - ffi' }
-GtGleamLibrary >> runner [ 
-	^ self class environment
-		at: #ThreadedFFIMigration
-		ifPresent: [ :aThreadedFFIMigration |
-			aThreadedFFIMigration threadedFFIAvailable
-				ifTrue: [ (self class environment at: #TFSameThreadRunner) uniqueInstance ]
-				ifFalse: [ super runner ] ]
-		ifAbsent: [ super runner ]
-]
-
 { #category : #'api - library' }
 GtGleamLibrary >> unix32LibraryName [
-	^ self class environment
-		at: #FFIUnix32LibraryFinder
-		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.so' ]
-		ifAbsent: [ self detectLibrary: 'libGleam.so' ]
+	^ FFIUnix32LibraryFinder findLibrary: 'libGleam.so'
 ]
 
 { #category : #'api - library' }
 GtGleamLibrary >> unix64LibraryName [
-	^ self class environment
-		at: #FFIUnix64LibraryFinder
-		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libGleam.so' ]
-		ifAbsent: [ self detectLibrary: 'libGleam.so' ]
+	^ FFIUnix64LibraryFinder findLibrary: 'libGleam.so'
 ]
 
 { #category : #'api - library' }
 GtGleamLibrary >> win32LibraryName [
-	^ self class environment
-		at: #FFIWindowsLibraryFinder
-		ifPresent: [ :aLibraryFinder | aLibraryFinder findAnyLibrary: #('Gleam.dll' 'libGleam.dll') ]
-		ifAbsent: [ self detectLibrary: 'libGleam.dll' ]
+	^ FFIWindowsLibraryFinder findLibrary: 'Gleam.dll'
 ]

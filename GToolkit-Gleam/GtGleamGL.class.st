@@ -29,6 +29,8 @@ GtGleamGLConstants classPool keys do: [ :eachName |
 Class {
 	#name : #GtGleamGL,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtGleamLibrary',
+	#classTraits : 'TGtGleamLibrary classTrait',
 	#classVars : [
 		'ClearBits',
 		'Errors',
@@ -38,7 +40,7 @@ Class {
 		'GtGleamGLConstants',
 		'GtGleamGLTypes'
 	],
-	#category : #'GToolkit-Gleam'
+	#category : #'GToolkit-Gleam-External'
 }
 
 { #category : #'api - enums' }
@@ -6263,14 +6265,14 @@ GtGleamGL class >> allEnums [
 GtGleamGL class >> enumAt: anIndex [
 	<return: #GtGleamGLConstant>
 	
-	^ GtBoxerString newDuring: [ :aName |
-		GtBoxerString newDuring: [ :aValue |
-			 GtBoxerString newDuring: [ :aType |
+	^ self ffiLibrary newStringDuring: [ :aName |
+		self ffiLibrary newStringDuring: [ :aValue |
+			 self ffiLibrary newStringDuring: [ :aType |
 				self primGLGetEnumAt: anIndex - 1 name: aName value: aValue type: aType.
 				GtGleamGLConstant fromTuple: { 
-					'GL_' , aName asString.
-					aValue asString.
-					aType asString } ] ] ]
+					'GL_' , aName string.
+					aValue string.
+					aType string } ] ] ]
 ]
 
 { #category : #'private - enums' }
@@ -6278,11 +6280,6 @@ GtGleamGL class >> enumsValued: aNumber [
 	<return: #Collection of: #GtGleamGLConstant>
 
 	^ self allEnums select: [ :eachEnum | eachEnum value = aNumber ]
-]
-
-{ #category : #'library path' }
-GtGleamGL class >> ffiLibrary [
-	^ GtGleamLibrary
 ]
 
 { #category : #'private - enums' }
@@ -6449,9 +6446,9 @@ GtGleamGL class >> primGLGetAmountOfEnums [
 { #category : #'private - ffi' }
 GtGleamGL class >> primGLGetEnumAt: anIndex name: aNameString value: aValueString type: aTypeString [
 	^ self ffiCall: #(void gleam_enum_get_at_gl(
-		GtBoxerString aNameString,
-		GtBoxerString aValueString,
-		GtBoxerString aTypeString,
+		GtStringBox aNameString,
+		GtStringBox aValueString,
+		GtStringBox aTypeString,
 		size_t anIndex))
 ]
 
@@ -6469,9 +6466,11 @@ GtGleamGL class >> primLoadGLes: aCallback [
 GtGleamGL class >> primLoaderCallbackFor: aBlock [
 	| aCallback |
 	
-	aCallback := GtGleamLoadCallback on: [ :aGtBoxerStringHandle |
+	aCallback := GtGleamLoadCallback on: [ :aStringBoxHandle |
 		"Rust owns aGtBoxerStringHandle, we should not take ownership"
-		aBlock value: (GtBoxerString fromHandle: aGtBoxerStringHandle) string ].
+		self ffiLibrary
+			unsafeStringFromHandle: aStringBoxHandle
+			during: [ :aStringBox | aBlock value: aStringBox string ] ].
 
 	^ aCallback
 ]
@@ -12816,10 +12815,10 @@ GtGleamGL >> delete_framebuffer: aFramebuffer [
 
 { #category : #'api - framebuffer' }
 GtGleamGL >> delete_framebuffers: aCollectionOfTextures [
-	GtBoxerArrayUInt
-		withAll: aCollectionOfTextures
-		during: [ :aGtBoxerArrayUInt | 
-			self primDeleteFramebuffers: aGtBoxerArrayUInt ]
+	self ffiLibrary
+		newArrayUIntWithAll: aCollectionOfTextures
+		during: [ :anArrayBox | 
+			self primDeleteFramebuffers: anArrayBox ]
 ]
 
 { #category : #'api - program' }
@@ -12834,10 +12833,10 @@ GtGleamGL >> delete_renderbuffer: aRenderbuffer [
 
 { #category : #'api - renderbuffer' }
 GtGleamGL >> delete_renderbuffers: aCollectionOfTextures [
-	GtBoxerArrayUInt
-		withAll: aCollectionOfTextures
-		during: [ :aGtBoxerArrayUInt | 
-			self primDeleteRenderbuffers: aGtBoxerArrayUInt ]
+	self ffiLibrary
+		newArrayUIntWithAll: aCollectionOfTextures
+		during: [ :anArrayBox | 
+			self primDeleteRenderbuffers: anArrayBox ]
 ]
 
 { #category : #'api - texture' }
@@ -12847,10 +12846,10 @@ GtGleamGL >> delete_texture: aTexture [
 
 { #category : #'api - texture' }
 GtGleamGL >> delete_textures: aCollectionOfTextures [
-	GtBoxerArrayUInt
-		withAll: aCollectionOfTextures
-		during: [ :aGtBoxerArrayUInt | 
-			self primDeleteTextures: aGtBoxerArrayUInt ]
+	self ffiLibrary
+		newArrayUIntWithAll: aCollectionOfTextures
+		during: [ :anArrayBox | 
+			self primDeleteTextures: anArrayBox ]
 ]
 
 { #category : #'api - general' }
@@ -12927,9 +12926,9 @@ GtGleamGL >> gen_framebuffer [
 GtGleamGL >> gen_framebuffers: anAmount [
 	<return: #Array of: #Number>
 	
-	^ GtBoxerArrayUInt newDuring: [ :aBoxerArrayUInt |
-		self primGenerateFramebuffers: aBoxerArrayUInt amount: anAmount.
-		aBoxerArrayUInt asArray ]
+	^ self ffiLibrary newArrayUIntDuring: [ :anArrayBox |
+		self primGenerateFramebuffers: anArrayBox amount: anAmount.
+		anArrayBox asArray ]
 ]
 
 { #category : #'api - renderbuffer' }
@@ -12943,9 +12942,9 @@ GtGleamGL >> gen_renderbuffer [
 GtGleamGL >> gen_renderbuffers: anAmount [
 	<return: #Array of: #Number>
 	
-	^ GtBoxerArrayUInt newDuring: [ :aBoxerArrayUInt |
-		self primGenerateRenderbuffers: aBoxerArrayUInt amount: anAmount.
-		aBoxerArrayUInt asArray ]
+	^ self ffiLibrary newArrayUIntDuring: [ :anArrayBox |
+		self primGenerateRenderbuffers: anArrayBox amount: anAmount.
+		anArrayBox asArray ]
 ]
 
 { #category : #'api - texture' }
@@ -12959,9 +12958,9 @@ GtGleamGL >> gen_texture [
 GtGleamGL >> gen_textures: anAmount [
 	<return: #Array of: #Number>
 	
-	^ GtBoxerArrayUInt newDuring: [ :aBoxerArrayUInt |
-		self primGenerateTextures: aBoxerArrayUInt amount: anAmount.
-		aBoxerArrayUInt asArray ]
+	^ self ffiLibrary newArrayUIntDuring: [ :anArrayBox |
+		self primGenerateTextures: anArrayBox amount: anAmount.
+		anArrayBox asArray ]
 ]
 
 { #category : #'api - vertex' }
@@ -12971,8 +12970,10 @@ GtGleamGL >> gen_vertex_array [
 
 { #category : #'api - program' }
 GtGleamGL >> get_attribute_location_program: aProgram name: aString [
-	^ GtBoxerString fromString: aString during: [ :aGtBoxerString |
-		self primGetAttributeLocationProgram: aProgram name: aGtBoxerString ]
+	^ self ffiLibrary
+		newString: aString
+		during: [ :aStringBox |
+			self primGetAttributeLocationProgram: aProgram name: aStringBox ]
 ]
 
 { #category : #'api - general' }
@@ -13002,29 +13003,30 @@ GtGleamGL >> get_integer: whichEnum [
 GtGleamGL >> get_program_info_log: aProgram [
 	<return: #String>
 	
-	^ GtBoxerString getStringFrom: [ :aGtBoxerString | self primGetProgramInfoLog: aProgram string: aGtBoxerString ]
+	^ self ffiLibrary getStringFrom: [ :aStringBox |
+		self primGetProgramInfoLog: aProgram string: aStringBox ]
 ]
 
 { #category : #'api - program' }
 GtGleamGL >> get_program_link_status: aProgram [
 	<return: #Boolean>
 
-	^ GtBoxerArrayInt
-		withAll: { self GL_FALSE value }
-		during: [ :aGtBoxerArrayInt |
-			self primGetProgram: aProgram param: self GL_LINK_STATUS value return: aGtBoxerArrayInt.
-			(aGtBoxerArrayInt at: 1) = self GL_TRUE value ]
+	^ self ffiLibrary
+		newArrayIntWithAll: { self GL_FALSE value }
+		during: [ :anArrayBoxInt |
+			self primGetProgram: aProgram param: self GL_LINK_STATUS value return: anArrayBoxInt.
+			(anArrayBoxInt at: 1) = self GL_TRUE value ]
 ]
 
 { #category : #'api - program' }
 GtGleamGL >> get_program_validate_status: aProgram [
 	<return: #Boolean>
 
-	^ GtBoxerArrayInt
-		withAll: { self GL_FALSE value }
-		during: [ :aGtBoxerArrayInt |
-			self primGetProgram: aProgram param: self GL_VALIDATE_STATUS value return: aGtBoxerArrayInt.
-			(aGtBoxerArrayInt at: 1) = self GL_TRUE value ]
+	^ self ffiLibrary
+		newArrayIntWithAll: { self GL_FALSE value }
+		during: [ :anArrayBoxInt |
+			self primGetProgram: aProgram param: self GL_VALIDATE_STATUS value return: anArrayBoxInt.
+			(anArrayBoxInt at: 1) = self GL_TRUE value ]
 ]
 
 { #category : #'api - accessing' }
@@ -13036,13 +13038,16 @@ GtGleamGL >> get_shader_version [
 GtGleamGL >> get_string: whichEnum [
 	<return: #String>
 	
-	^ GtBoxerString getStringFrom: [ :aBoxerString | self primGetString: whichEnum value in: aBoxerString ]
+	^ self ffiLibrary getStringFrom: [ :aStringBox |
+		self primGetString: whichEnum value in: aStringBox ]
 ]
 
 { #category : #'api - program' }
 GtGleamGL >> get_uniform_location_program: aProgram name: aString [
-	^ GtBoxerString fromString: aString during: [ :aGtBoxerString |
-		self primGetUniformLocationProgram: aProgram name: aGtBoxerString ]
+	^ self ffiLibrary
+		newString: aString
+		during: [ :aStringBox |
+			self primGetUniformLocationProgram: aProgram name: aStringBox ]
 ]
 
 { #category : #'gt-extension' }
@@ -13095,18 +13100,18 @@ GtGleamGL >> primClearColorR: r g: g b: b a: a [
 ]
 
 { #category : #'private - ffi framebuffer' }
-GtGleamGL >> primDeleteFramebuffers: aGtBoxerArrayUInt [
-	^ self ffiCall: #( void gleam_delete_framebuffers ( self, GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primDeleteFramebuffers: anArrayBox [
+	^ self ffiCall: #( void gleam_delete_framebuffers ( self, GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi renderbuffer' }
-GtGleamGL >> primDeleteRenderbuffers: aGtBoxerArrayUInt [
-	^ self ffiCall: #( void gleam_delete_renderbuffers ( self, GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primDeleteRenderbuffers: anArrayBox [
+	^ self ffiCall: #( void gleam_delete_renderbuffers ( self, GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi texture' }
-GtGleamGL >> primDeleteTextures: aGtBoxerArrayUInt [
-	^ self ffiCall: #( void gleam_delete_textures ( self, GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primDeleteTextures: anArrayBox [
+	^ self ffiCall: #( void gleam_delete_textures ( self, GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi general' }
@@ -13129,18 +13134,18 @@ GtGleamGL >> primEnable: aCapEnum [
 ]
 
 { #category : #'private - ffi framebuffer' }
-GtGleamGL >> primGenerateFramebuffers: aGtBoxerArrayUInt amount: aNumber [
-	^ self ffiCall: #( void gleam_gen_framebuffers ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primGenerateFramebuffers: anArrayBox amount: aNumber [
+	^ self ffiCall: #( void gleam_gen_framebuffers ( self, GLsizei aNumber,  GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi renderbuffer' }
-GtGleamGL >> primGenerateRenderbuffers: aGtBoxerArrayUInt amount: aNumber [
-	^ self ffiCall: #( void gleam_gen_renderbuffers ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primGenerateRenderbuffers: anArrayBox amount: aNumber [
+	^ self ffiCall: #( void gleam_gen_renderbuffers ( self, GLsizei aNumber,  GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi texture' }
-GtGleamGL >> primGenerateTextures: aGtBoxerArrayUInt amount: aNumber [
-	^ self ffiCall: #( void gleam_gen_textures ( self, GLsizei aNumber,  GtBoxerArrayUInt aGtBoxerArrayUInt ) )
+GtGleamGL >> primGenerateTextures: anArrayBox amount: aNumber [
+	^ self ffiCall: #( void gleam_gen_textures ( self, GLsizei aNumber,  GtArrayBoxUInt anArrayBox ) )
 ]
 
 { #category : #'private - ffi program' }
@@ -13162,18 +13167,18 @@ GtGleamGL >> primGetInteger: which [
 ]
 
 { #category : #'private - ffi program' }
-GtGleamGL >> primGetProgram: aProgram param: aParamName return: aBoxerArrayInt [
-	^ self ffiCall: #(void gleam_get_program_iv(self, GLuint aProgram, GLenum aParamName, GtBoxerArrayInt aBoxerArrayInt))
+GtGleamGL >> primGetProgram: aProgram param: aParamName return: anArrayBoxInt [
+	^ self ffiCall: #(void gleam_get_program_iv(self, GLuint aProgram, GLenum aParamName, GtArrayBoxInt anArrayBoxInt))
 ]
 
 { #category : #'private - ffi program' }
-GtGleamGL >> primGetProgramInfoLog: aProgram string: aGtBoxerString [
-	^ self ffiCall: #(void gleam_get_program_info_log(self, GLuint aProgram, GtBoxerString aGtBoxerString))
+GtGleamGL >> primGetProgramInfoLog: aProgram string: aStringBox [
+	^ self ffiCall: #(void gleam_get_program_info_log(self, GLuint aProgram, GtStringBox aStringBox))
 ]
 
 { #category : #'private - ffi general' }
-GtGleamGL >> primGetString: which in: aGtBoxerString [
-	^ self ffiCall: #( void gleam_get_string ( self, GLenum which, GtBoxerString aGtBoxerString) )
+GtGleamGL >> primGetString: which in: aStringBox [
+	^ self ffiCall: #( void gleam_get_string ( self, GLenum which, GtStringBox aStringBox) )
 ]
 
 { #category : #'private - ffi program' }
@@ -13185,7 +13190,7 @@ GtGleamGL >> primGetUniformLocationProgram: program name: aGtBoxerString [
 ]
 
 { #category : #'private - ffi general' }
-GtGleamGL >> primReadPixelsX: aX y: aY width: aWidth height: aHeight format: aFormat pixelType: aPixelType pixels: aGtBoxerArrayU8 [
+GtGleamGL >> primReadPixelsX: aX y: aY width: aWidth height: aHeight format: aFormat pixelType: aPixelType pixels: anArrayBox [
 	^ self ffiCall: #(void gleam_read_pixels(
 		self,
 		GLint aX,
@@ -13194,7 +13199,7 @@ GtGleamGL >> primReadPixelsX: aX y: aY width: aWidth height: aHeight format: aFo
 		GLsizei aHeight,
 		GLenum aFormat,
 		GLenum aPixelType,
-		GtBoxerArrayU8 aGtBoxerArrayU8))
+		GtArrayBoxU8 anArrayBox))
 ]
 
 { #category : #'private - ffi texture' }
@@ -13207,12 +13212,12 @@ GtGleamGL >> primSetTexParameterInt: target name: pname param: param [
 ]
 
 { #category : #'private - ffi shader' }
-GtGleamGL >> primShaderSource: aShader string: aGtBoxerString [
-	^ self ffiCall: #( void gleam_shader_source ( self, GLuint aShader, GtBoxerString aGtBoxerString ) )
+GtGleamGL >> primShaderSource: aShader string: aStringBox [
+	^ self ffiCall: #( void gleam_shader_source ( self, GLuint aShader, GtStringBox aStringBox ) )
 ]
 
 { #category : #'private - ffi texture' }
-GtGleamGL >> primTexImage2D: aTarget level: aLevel internalFormat: anInternalFormat width: aWidth height: aHeight border: aBorder format: aFormat type: aType pixels: aGtBoxerArrayU8 [
+GtGleamGL >> primTexImage2D: aTarget level: aLevel internalFormat: anInternalFormat width: aWidth height: aHeight border: aBorder format: aFormat type: aType pixels: anArrayBox [
 	self ffiCall: #( void gleam_tex_image_2d (
 		self,
 		GLenum aTarget,
@@ -13223,11 +13228,11 @@ GtGleamGL >> primTexImage2D: aTarget level: aLevel internalFormat: anInternalFor
 		GLint aBorder,
 		GLenum aFormat,
 		GLenum aType,
-		GtBoxerArrayU8 aGtBoxerArrayU8) )
+		GtArrayBoxU8 anArrayBox) )
 ]
 
 { #category : #'private - ffi texture' }
-GtGleamGL >> primTexSubImage2D: aTarget level: level xoffset: xoffset yoffset: yoffset width: width height: height format: format type: type pixels: aGtBoxerArrayU8 [
+GtGleamGL >> primTexSubImage2D: aTarget level: level xoffset: xoffset yoffset: yoffset width: width height: height format: format type: type pixels: anArrayBox [
 	^ self ffiCall: #( void gleam_tex_sub_image_2d (
 		self,
 		GLenum aTarget,
@@ -13238,7 +13243,7 @@ GtGleamGL >> primTexSubImage2D: aTarget level: level xoffset: xoffset yoffset: y
 		GLsizei height,
 		GLenum format,
 		GLenum type,
-		GtBoxerArrayU8 aGtBoxerArrayU8) )
+		GtArrayBoxU8 anArrayBox) )
 ]
 
 { #category : #'private - ffi vertex' }
@@ -13263,10 +13268,10 @@ GtGleamGL >> primViewportX: x y: y width: width height: height [
 
 { #category : #'api - general' }
 GtGleamGL >> read_pixels: aRectangle format: aFormat pixelType: aPixelType [
-	<return: #GtBoxerArrayU8>
+	<return: #GtArrayBoxU8>
 	| aGtBoxerArray |
 	
-	aGtBoxerArray := GtBoxerArrayU8 new.
+	aGtBoxerArray := self ffiLibrary newArrayU8.
 	self
 		primReadPixelsX: aRectangle left
 		y: aRectangle top
@@ -13275,7 +13280,7 @@ GtGleamGL >> read_pixels: aRectangle format: aFormat pixelType: aPixelType [
 		format: aFormat value
 		pixelType: aPixelType value
 		pixels: aGtBoxerArray.
-			
+
 	^ aGtBoxerArray
 ]
 
@@ -13297,10 +13302,10 @@ GtGleamGL >> shaderVersion [
 
 { #category : #'api - shader' }
 GtGleamGL >> shader_source: aShader string: aString [
-	GtBoxerString
-		"line endings must corresponds to the platform, otherwise will not compile"
-		fromString: (aString withLineEndings: OSPlatform current lineEnding)
-		during: [ :aGtBoxerString | self primShaderSource: aShader string: aGtBoxerString ]
+	self ffiLibrary
+		"line endings must corresponds to the platform, otherwise shader will not compile"
+		newString: (aString withLineEndings: OSPlatform current lineEnding)
+		during: [ :aStringBox | self primShaderSource: aShader string: aStringBox ]
 ]
 
 { #category : #'api - texture' }
@@ -13347,7 +13352,7 @@ GtGleamGL >> tex_parameter_i: aTargetEnum name: aParameterName param: aParameter
 ]
 
 { #category : #'api - texture' }
-GtGleamGL >> tex_sub_image_2d: aTargetEnum level: level xoffset: xoffset yoffset: yoffset width: width height: height format: aFormatEnum type: aPixelTypeEnum pixels: aGtBoxerArrayU8 [
+GtGleamGL >> tex_sub_image_2d: aTargetEnum level: level xoffset: xoffset yoffset: yoffset width: width height: height format: aFormatEnum type: aPixelTypeEnum pixels: anArrayBox [
 	self
 		primTexSubImage2D: aTargetEnum value
 		level: level
@@ -13357,7 +13362,7 @@ GtGleamGL >> tex_sub_image_2d: aTargetEnum level: level xoffset: xoffset yoffset
 		height: height
 		format: aFormatEnum value
 		type: aPixelTypeEnum value
-		pixels: aGtBoxerArrayU8
+		pixels: anArrayBox
 ]
 
 { #category : #'api - uniform' }
