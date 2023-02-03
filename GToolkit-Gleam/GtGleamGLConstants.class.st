@@ -1260,7 +1260,7 @@ Class {
 		'GL_ZOOM_X',
 		'GL_ZOOM_Y'
 	],
-	#category : #'GToolkit-Gleam'
+	#category : #'GToolkit-Gleam-Constants'
 }
 
 { #category : #'constant data' }

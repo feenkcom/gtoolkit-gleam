@@ -1,9 +1,6 @@
 Class {
 	#name : #BaselineOfGToolkitGleam,
 	#superclass : #BaselineOf,
-	#classVars : [
-		'PostLoaded'
-	],
 	#category : #BaselineOfGToolkitGleam
 }
 
@@ -22,18 +19,4 @@ BaselineOfGToolkitGleam >> baseline: spec [
 		spec package: 'GToolkit-Gleam' with: [
 			spec requires: #('GToolkitInstaller' 'GToolkitBoxer') ].
 	]
-]
-
-{ #category : #baselines }
-BaselineOfGToolkitGleam >> postLoadGleam: spec [
-	(PostLoaded isNotNil and: [ PostLoaded ])
-		ifTrue: [ ^ self ].
-
-	PostLoaded := true.
-	self postLoadInstallGleamBinary: spec
-]
-
-{ #category : #baselines }
-BaselineOfGToolkitGleam >> postLoadInstallGleamBinary: aSpec [
-	(self class environment at: #GtGleamLibrary) install
 ]
