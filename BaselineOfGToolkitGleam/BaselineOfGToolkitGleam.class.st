@@ -10,7 +10,7 @@ BaselineOfGToolkitGleam >> baseline: spec [
 	spec for: #'common' do: [
 		spec
 			baseline: 'GToolkitBoxer' with: [
-				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.53/boxer-bindings' ].
+				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.54/boxer-bindings' ].
 
 		spec package: 'GToolkit-Gleam' with: [
 			spec requires: #('GToolkitBoxer') ].
